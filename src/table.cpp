@@ -25,6 +25,10 @@ class DynamicTable {
     public:
         // Add a row to the table
         void addRow(const std::string& label, int high = -1, int low = -1, int topVar = -1) {
+            if(topVar == -1) {
+                topVar = last_id;
+            }
+
             rows.emplace_back(last_id, label, high, low, topVar);
             idMap[last_id++] = rows.size() - 1;
         }
