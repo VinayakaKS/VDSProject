@@ -9,16 +9,19 @@
 #include <iostream>
 #include <table.cpp>
 
+
 namespace ClassProject {
+    
     class Manager : public ManagerInterface {
     
-    public: 
+    public:
         Manager() {
-            unique_table.addRow("FALSE" , 0 , 0 , 0);
-            unique_table.addRow("TRUE" , 1 , 1 , 1);
+            TableRow true_node = {1,"TRUE",1,1,1};
+            TableRow false_node = {0,"FALSE",0,0,0};
+            unique_table.addRow(&true_node);
+            unique_table.addRow(&false_node);
             unique_table.displayTable();
-        };
-
+        }
         virtual BDD_ID createVar(const std::string &label) override {
             return -1;
         };
