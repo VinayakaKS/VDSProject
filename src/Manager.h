@@ -18,13 +18,11 @@ namespace ClassProject {
         Manager() {
             TableRow true_node = {1,"TRUE",1,1,1};
             TableRow false_node = {0,"FALSE",0,0,0};
-            unique_table.addRow(&true_node);
             unique_table.addRow(&false_node);
-            unique_table.displayTable();
+            unique_table.addRow(&true_node);
         }
-        virtual BDD_ID createVar(const std::string &label) override {
-            return -1;
-        };
+        
+        virtual BDD_ID createVar(const std::string &label);
 
         virtual const BDD_ID &True() override {
             return TRUE_ROW;
@@ -46,9 +44,7 @@ namespace ClassProject {
             return -1;
         };
 
-        virtual BDD_ID ite(BDD_ID i, BDD_ID t, BDD_ID e) override {
-            return -1;
-        };
+        virtual BDD_ID ite(BDD_ID i, BDD_ID t, BDD_ID e);
 
         virtual BDD_ID coFactorTrue(BDD_ID f, BDD_ID x) override {
             return -1;
@@ -71,7 +67,7 @@ namespace ClassProject {
         };
 
         virtual BDD_ID or2(BDD_ID a, BDD_ID b) override {
-            return -1;
+            return -1; //ite(a,1,b)
         };
 
         virtual BDD_ID xor2(BDD_ID a, BDD_ID b) override {
@@ -110,7 +106,18 @@ namespace ClassProject {
 
         virtual void visualizeBDD(std::string filepath, BDD_ID &root) override {
         };
+
+        void print_table() {
+            unique_table.displayTable();
+        }
     
+        //         // Display the table
+        // void displayTable() const {
+        //     std::cout << "BDD_ID\tLabel\tHigh\tLow\tTopVar\n";
+        //     for (const auto &row : unique_table.UniqueTable) {
+        //         std::cout << row.id << "\t" << row.label << "\t" << row.high << "\t" << row.low << "\t" << row.topVar << "\n";
+        //     }
+        // }
 
     private:
         DynamicTable unique_table;
@@ -118,5 +125,7 @@ namespace ClassProject {
         const BDD_ID TRUE_ROW = 99999;
     };
 }
+
+
 
 #endif

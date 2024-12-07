@@ -18,9 +18,7 @@ struct TableRow {
     size_t low;                      // Points to low side node
     size_t topVar;                   // Top variable
 
-    
-
-    TableRow(size_t id = LIMIT, const string &label, size_t high = LIMIT, size_t low = LIMIT, size_t topVar = LIMIT)
+    TableRow(size_t id = LIMIT, const string &label="", size_t high = LIMIT, size_t low = LIMIT, size_t topVar = LIMIT)
         : id(id), label(label), high(high), low(low), topVar(topVar) {}
 };
 
@@ -33,7 +31,6 @@ class DynamicTable {
 
     public:
         // Add a row to the table 
-        //TODO: size_t is unsigned long => -1 is not a correct implementation
         size_t addRow(TableRow *row_data) {
             if(row_data->topVar == LIMIT) {
                 row_data->topVar = last_id;
@@ -48,7 +45,6 @@ class DynamicTable {
             }
 
             TableRow data = {last_id, row_data->label,row_data->high,row_data->low,row_data->topVar};
-            // UniqueTable.emplace_back(last_id, row_data->label, row_data->high, row_data->low, row_data->topVar);
             UniqueTable.push_back(data);
             idMap[last_id++] = UniqueTable.size() - 1;
             labelMap[row_data->label] = UniqueTable.size() - 1;
