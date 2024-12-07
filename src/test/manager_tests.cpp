@@ -8,21 +8,26 @@
 class ManagerTest : public ::testing::Test {
 protected:
     static ClassProject::Manager* obj;
+    static ClassProject::Manager* obj2;
 
     static void SetUpTestSuite() {
         std::cout << "Setting up test suite\n";
         obj = new ClassProject::Manager(); // Initialize once for all tests
+        obj2 = new ClassProject::Manager(); // Initialize once for all tests
         std::cout << "obj initialized: " << obj << "\n";
     }
 
     static void TearDownTestSuite() {
         std::cout << "Tearing down test suite\n";
         delete obj;
+        delete obj2;
         obj = nullptr;
+        obj2 = nullptr;
     }
 };
 
 ClassProject::Manager* ManagerTest::obj = nullptr;
+ClassProject::Manager* ManagerTest::obj2 = nullptr;
 
 const ClassProject::BDD_ID FASLE_ID = 0;
 const ClassProject::BDD_ID TRUE_ID = 1;
