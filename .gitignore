@@ -1,3 +1,4 @@
 gtest/
 build/
 .vscode/
+src/ManagerNotes.h

@@ -5,6 +5,11 @@
 #include <memory> // For smart pointers
 
 using namespace std;
+
+const size_t LIMIT = 9999999999;
+const size_t HIGH = 1;
+const size_t LOW = 0;
+
 // Row structure
 struct TableRow {
     size_t id;                       // Unique identifier
@@ -13,25 +18,41 @@ struct TableRow {
     size_t low;                      // Points to low side node
     size_t topVar;                   // Top variable
 
-    TableRow(size_t id, const string &label, size_t high, size_t low, size_t topVar)
+    
+
+    TableRow(size_t id = LIMIT, const string &label, size_t high = LIMIT, size_t low = LIMIT, size_t topVar = LIMIT)
         : id(id), label(label), high(high), low(low), topVar(topVar) {}
 };
 
 // Table class
 class DynamicTable {
     vector<TableRow> UniqueTable;             // Stores rows in Unique table
-    unordered_map<int, size_t> idMap;         // Maps id to index in `UniqueTable` for fast lookup
+    unordered_map<size_t, size_t> idMap;         // Maps id to index in `UniqueTable` for fast lookup
+    unordered_map<string, size_t> labelMap;         // Maps id to index in `UniqueTable` for fast lookup
     size_t last_id = 0;
 
     public:
         // Add a row to the table 
         //TODO: size_t is unsigned long => -1 is not a correct implementation
-        void addRow(TableRow *row_data) {
-            row_data->topVar = last_id;
+        size_t addRow(TableRow *row_data) {
+            if(row_data->topVar == LIMIT) {
+                row_data->topVar = last_id;
+            }
+
+            if(row_data->high == LIMIT) {
+                row_data->high = HIGH;
+            }
+
+            if(row_data->low == LIMIT) {
+                row_data->high = LOW;
+            }
+
             TableRow data = {last_id, row_data->label,row_data->high,row_data->low,row_data->topVar};
             // UniqueTable.emplace_back(last_id, row_data->label, row_data->high, row_data->low, row_data->topVar);
             UniqueTable.push_back(data);
             idMap[last_id++] = UniqueTable.size() - 1;
+            labelMap[row_data->label] = UniqueTable.size() - 1;
+            return (last_id - 1);
         }
 
         // Get a row by id
@@ -41,6 +62,27 @@ class DynamicTable {
             }
             return nullptr;
         }
+
+        // Get a row by label
+        TableRow* getRowByLabel(string label) {
+            if (labelMap.find(label) != labelMap.end()) {
+                return &UniqueTable[labelMap[label]];
+            }
+            return nullptr;
+        }
+
+        // Get a row by data
+        TableRow* getRowByData(size_t high , size_t low , size_t topVar) {
+            for (const auto& row : UniqueTable) {
+                if (row.high == high && row.low == low && row.topVar == topVar) {
+                    // Found the row, use it
+                    return &UniqueTable[row.id];
+                }
+            }
+            
+            return nullptr;
+        }
+
 
         // Display the table
         void displayTable() const {
