@@ -26,6 +26,12 @@ ClassProject::Manager* ManagerTest::obj = nullptr;
 
 const ClassProject::BDD_ID FASLE_ID = 0;
 const ClassProject::BDD_ID TRUE_ID = 1;
+const ClassProject::BDD_ID A = 2;
+const ClassProject::BDD_ID B = 3;
+const ClassProject::BDD_ID C = 4;
+const ClassProject::BDD_ID D = 5;
+const ClassProject::BDD_ID A_OR_B = 6;
+const ClassProject::BDD_ID C_AND_D = 7;
 
 // Example test case for the Manager module
 TEST_F(ManagerTest, False) {
@@ -82,6 +88,55 @@ TEST_F(ManagerTest, TRUE) {
 //         virtual BDD_ID ite(BDD_ID i, BDD_ID t, BDD_ID e) override {  // N
 //             return -1;
 //         };
+
+
+// Throws Exception when calling ite with an invalid BDD_ID
+TEST_F(ManagerTest, iteException) {
+    ClassProject::BDD_ID Invalid_id = 9999;
+    EXPECT_ANY_THROW( obj->ite(Invalid_id , FASLE_ID , FASLE_ID));
+}
+
+// Terminal Case 1 Test
+TEST_F(ManagerTest, iteTerminal1) {
+    EXPECT_EQ( obj->ite(TRUE_ID , B , C) , B);
+}
+
+// Terminal Case 2 Test
+TEST_F(ManagerTest, iteTerminal2) {  
+    EXPECT_EQ( obj->ite(FASLE_ID , B , C) , C);
+}
+
+// Terminal Case 3 Test
+TEST_F(ManagerTest, iteTerminal3) {  
+    EXPECT_EQ( obj->ite(B , C , C) , C);
+}
+
+// Terminal Case 4 Test
+TEST_F(ManagerTest, iteTerminal4) {  
+    EXPECT_EQ( obj->ite(B , TRUE_ID , FASLE_ID) , B);
+}
+
+// Terminal Case 5 Test
+TEST_F(ManagerTest, iteTerminal5) {  
+    EXPECT_EQ( obj->ite(B , FASLE_ID , FASLE_ID) , FASLE_ID);
+}
+
+// Terminal Case 6 Test
+TEST_F(ManagerTest, iteTerminal6) {  
+    EXPECT_EQ( obj->ite(B , TRUE_ID , TRUE_ID) , TRUE_ID);
+}
+
+// A OR B Case 7 Test
+TEST_F(ManagerTest, iteAorB) {  
+    EXPECT_EQ( obj->ite(A , TRUE_ID , B) , A_OR_B);
+}
+
+// C and D Case 7 Test
+TEST_F(ManagerTest, iteCandD) {  
+    EXPECT_EQ( obj->ite(C , D , FASLE_ID) , C_AND_D);
+}
+
+
 
 //         virtual BDD_ID coFactorTrue(BDD_ID f, BDD_ID x) override {  // N
 //             return -1;
