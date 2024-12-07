@@ -47,27 +47,63 @@ BDD_ID Manager::topVar(BDD_ID f) {
 };
 
 
+BDD_ID Manager::coFactorTrue(BDD_ID f, BDD_ID x){
+    TableRow* row;
+    if(topVar(f) == x)
+    {
+        row = unique_table.getRowById(f);
+        return row->high;
+    }
+        
+    else return f;
+
+};
+
+BDD_ID Manager::coFactorFalse(BDD_ID f, BDD_ID x){
+    TableRow* row;
+    if(topVar(f) == x)
+    {
+        row = unique_table.getRowById(f);
+        return row->low;
+    }
+        
+    else return f;
+
+};
+
+BDD_ID Manager::coFactorTrue(BDD_ID f){
+    return -1;
+};
+
+BDD_ID Manager::coFactorFalse(BDD_ID f){
+    return -1;
+};
+
 BDD_ID Manager::ite(BDD_ID i, BDD_ID t, BDD_ID e)
 {
-    // BDD_ID topVar;
-    // BDD_ID high, low;
-    // TableRow new_row_data;
+    BDD_ID topVariable,topVari,topVart,topVare;
+    BDD_ID high, low;
+    TableRow new_row_data;
 
-    // //check for terminal cases
-    // if(i==1) return t; //ite(1,t,e)
-    // if(i==0) return e; //ite(0,t,e)
-    // if(t==e) return t; //ite(i,t,t)
-    // if(t==1 && e==0) return i; //ite(i,1,0)
-    // //ite(i,0,1) should return neg(i)
+    //check for terminal cases
+    if(i==1) return t; //ite(1,t,e)
+    if(i==0) return e; //ite(0,t,e)
+    if(t==e) return t; //ite(i,t,t)
+    if(t==1 && e==0) return i; //ite(i,1,0)
+    //ite(i,0,1) should return neg(i)
 
-    // //determine the top variable
-    // topVar = min(manager.topVar(i),manager.topVar(t),manager.topVar(e));
-    // high = manager.ite(manager.coFactorTrue(i,topVar),manager.coFactorTrue(t,topVar),manager.coFactorTrue(e,topVar));
-    // low = manager.ite(manager.coFactorFalse(i,topVar),manager.coFactorFalse(t,topVar),manager.coFactorFalse(e,topVar));
+    //determine the top variable
+    topVari =  (isVariable(i))? topVar(i): LIMIT;
+    topVart =  (isVariable(t))? topVar(t): LIMIT;
+    topVare =  (isVariable(e))? topVar(e): LIMIT;
 
-    // if(high == low) return high;
-    // new_row_data = {topVar,"funct",high,low};
-    // return manager.unique_table.addRow(&new_row_data); //TODO: check if already present  
+    topVariable = min(topVari,topVart);
+    topVariable = min(topVariable,topVare);
 
-        return -1;
+    high = ite(coFactorTrue(i,topVariable),coFactorTrue(t,topVariable),coFactorTrue(e,topVariable));
+    low = ite(coFactorFalse(i,topVariable),coFactorFalse(t,topVariable),coFactorFalse(e,topVariable));
+
+    if(high == low) return high;
+    new_row_data = {0,"funct",high,low,topVariable};
+    return unique_table.addRow(&new_row_data); //TODO: check if already present in the table
 };

@@ -46,6 +46,7 @@ class DynamicTable {
 
             TableRow data = {last_id, row_data->label,row_data->high,row_data->low,row_data->topVar};
             UniqueTable.push_back(data);
+            cout<< "added a row - "<< last_id<< " "<<row_data->label;
             idMap[last_id++] = UniqueTable.size() - 1;
             labelMap[row_data->label] = UniqueTable.size() - 1;
             return (last_id - 1);
