@@ -6,7 +6,44 @@ using namespace ClassProject;
 typedef size_t BDD_ID;
 
 BDD_ID Manager::createVar(const std::string &label) {
-    return -1;
+    std::regex pattern("^!?[A-Za-z]([+*^!][A-Za-z])*$");
+    if(!std::regex_match(label, pattern)) {
+        throw std::runtime_error("Variable label is not valid. A valid label should contain one or more single alphabets seperated by logical operators (+ * ^ !) or starting with !");
+    }
+
+    if(unique_table.getRowByLabel(label)) {
+        throw std::runtime_error("Variable label already exists. Please try a new label");
+    } else {
+        TableRow new_var = { 0 , label};
+        return unique_table.addRow(&new_var);
+    }
+};
+
+bool Manager::isConstant(BDD_ID f) {
+    TableRow* tr = unique_table.getRowById(f);
+    if(tr) {
+        return (f == FALSE_ROW || f == TRUE_ROW) ;
+    } else {
+        throw std::runtime_error("Row with this id does not exist.");
+    }
+};
+
+bool Manager::isVariable(BDD_ID x) {
+    TableRow* tr = unique_table.getRowById(x); 
+    if(tr) {
+        return (x != FALSE_ROW && x != TRUE_ROW && tr->high == TRUE_ROW && tr->low == FALSE_ROW && tr->topVar == x) ;
+    } else {
+        throw std::runtime_error("Row with this id does not exist.");
+    }
+};
+
+BDD_ID Manager::topVar(BDD_ID f) {
+    TableRow* tr = unique_table.getRowById(f); 
+    if(tr) {
+        return tr->topVar;
+    } else {
+        throw std::runtime_error("Row with this id does not exist.");
+    }
 };
 
 

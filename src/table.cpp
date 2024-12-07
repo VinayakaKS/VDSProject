@@ -41,7 +41,7 @@ class DynamicTable {
             }
 
             if(row_data->low == LIMIT) {
-                row_data->high = LOW;
+                row_data->low = LOW;
             }
 
             TableRow data = {last_id, row_data->label,row_data->high,row_data->low,row_data->topVar};

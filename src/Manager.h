@@ -8,6 +8,7 @@
 #include "ManagerInterface.h"
 #include <iostream>
 #include <table.cpp>
+#include <regex>
 
 
 namespace ClassProject {
@@ -32,17 +33,11 @@ namespace ClassProject {
             return FALSE_ROW;
         };
 
-        virtual bool isConstant(BDD_ID f) override {
-            return -1;
-        };
+        virtual bool isConstant(BDD_ID f);
 
-        virtual bool isVariable(BDD_ID x) override {
-            return -1;
-        };
+        virtual bool isVariable(BDD_ID x);
 
-        virtual BDD_ID topVar(BDD_ID f) override {
-            return -1;
-        };
+        virtual BDD_ID topVar(BDD_ID f);
 
         virtual BDD_ID ite(BDD_ID i, BDD_ID t, BDD_ID e);
 
@@ -121,8 +116,8 @@ namespace ClassProject {
 
     private:
         DynamicTable unique_table;
-        const BDD_ID FALSE_ROW = 99999;
-        const BDD_ID TRUE_ROW = 99999;
+        const BDD_ID FALSE_ROW = 0;
+        const BDD_ID TRUE_ROW = 1;
     };
 }
 

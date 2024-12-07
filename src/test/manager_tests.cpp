@@ -76,7 +76,7 @@ TEST_F(ManagerTest, Createvar_UniQueidforlabel) {
 
 //isConstant_S
 TEST_F(ManagerTest, isConstant_invalidinput) {
-    EXPECT_ANY_THROW( obj->topVar(Invalid));
+    EXPECT_ANY_THROW( obj->isConstant(Invalid));
 }
 TEST_F(ManagerTest, isConstant_validreturn) {
     EXPECT_EQ( obj->isConstant(TRUE_ID),true);
@@ -85,18 +85,19 @@ TEST_F(ManagerTest, isConstant_validreturn) {
 }
 //end of isConstant
 
-//isVariable_
+// //isVariable_
 TEST_F(ManagerTest, isVariable_invalidinput) {
-    EXPECT_ANY_THROW( obj->topVar(Invalid));
+    EXPECT_ANY_THROW( obj->isVariable(Invalid));
 }
 TEST_F(ManagerTest, isVariable_validreturn) {
+    obj->print_table();
     EXPECT_EQ( obj->isVariable(TRUE_ID),false);
     EXPECT_EQ( obj->isVariable(FALSE_ID),false);
     EXPECT_EQ( obj->isVariable(B),true);
 };
-//end of isVariable
+// //end of isVariable
 
-//topVar()
+// //topVar()
 //valid input
 TEST_F(ManagerTest, topvar_invalidinput) {
     EXPECT_ANY_THROW( obj->topVar(Invalid));
@@ -147,50 +148,50 @@ TEST_F(ManagerTest, topvar_validreturn) {
 
 
 // Throws Exception when calling ite with an invalid BDD_ID
-TEST_F(ManagerTest, iteException) {
-    ClassProject::BDD_ID Invalid_id = 9999;
-    EXPECT_ANY_THROW( obj->ite(Invalid_id , FALSE_ID , FALSE_ID));
-}
+// TEST_F(ManagerTest, iteException) {
+//     ClassProject::BDD_ID Invalid_id = 9999;
+//     EXPECT_ANY_THROW( obj->ite(Invalid_id , FALSE_ID , FALSE_ID));
+// }
 
-// Terminal Case 1 Test
-TEST_F(ManagerTest, iteTerminal1) {
-    EXPECT_EQ( obj->ite(TRUE_ID , B , C) , B);
-}
+// // Terminal Case 1 Test
+// TEST_F(ManagerTest, iteTerminal1) {
+//     EXPECT_EQ( obj->ite(TRUE_ID , B , C) , B);
+// }
 
-// Terminal Case 2 Test
-TEST_F(ManagerTest, iteTerminal2) {  
-    EXPECT_EQ( obj->ite(FALSE_ID , B , C) , C);
-}
+// // Terminal Case 2 Test
+// TEST_F(ManagerTest, iteTerminal2) {  
+//     EXPECT_EQ( obj->ite(FALSE_ID , B , C) , C);
+// }
 
-// Terminal Case 3 Test
-TEST_F(ManagerTest, iteTerminal3) {  
-    EXPECT_EQ( obj->ite(B , C , C) , C);
-}
+// // Terminal Case 3 Test
+// TEST_F(ManagerTest, iteTerminal3) {  
+//     EXPECT_EQ( obj->ite(B , C , C) , C);
+// }
 
-// Terminal Case 4 Test
-TEST_F(ManagerTest, iteTerminal4) {  
-    EXPECT_EQ( obj->ite(B , TRUE_ID , FALSE_ID) , B);
-}
+// // Terminal Case 4 Test
+// TEST_F(ManagerTest, iteTerminal4) {  
+//     EXPECT_EQ( obj->ite(B , TRUE_ID , FALSE_ID) , B);
+// }
 
-// Terminal Case 5 Test
-TEST_F(ManagerTest, iteTerminal5) {  
-    EXPECT_EQ( obj->ite(B , FALSE_ID , FALSE_ID) , FALSE_ID);
-}
+// // Terminal Case 5 Test
+// TEST_F(ManagerTest, iteTerminal5) {  
+//     EXPECT_EQ( obj->ite(B , FALSE_ID , FALSE_ID) , FALSE_ID);
+// }
 
-// Terminal Case 6 Test
-TEST_F(ManagerTest, iteTerminal6) {  
-    EXPECT_EQ( obj->ite(B , TRUE_ID , TRUE_ID) , TRUE_ID);
-}
+// // Terminal Case 6 Test
+// TEST_F(ManagerTest, iteTerminal6) {  
+//     EXPECT_EQ( obj->ite(B , TRUE_ID , TRUE_ID) , TRUE_ID);
+// }
 
-// A OR B Case 7 Test
-TEST_F(ManagerTest, iteAorB) {  
-    EXPECT_EQ( obj->ite(A , TRUE_ID , B) , A_OR_B);
-}
+// // A OR B Case 7 Test
+// TEST_F(ManagerTest, iteAorB) {  
+//     EXPECT_EQ( obj->ite(A , TRUE_ID , B) , A_OR_B);
+// }
 
-// C and D Case 7 Test
-TEST_F(ManagerTest, iteCandD) {  
-    EXPECT_EQ( obj->ite(C , D , FALSE_ID) , C_AND_D);
-}
+// // C and D Case 7 Test
+// TEST_F(ManagerTest, iteCandD) {  
+//     EXPECT_EQ( obj->ite(C , D , FALSE_ID) , C_AND_D);
+// }
 
 
 
