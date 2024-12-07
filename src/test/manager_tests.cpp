@@ -29,39 +29,90 @@ protected:
 ClassProject::Manager* ManagerTest::obj = nullptr;
 ClassProject::Manager* ManagerTest::obj2 = nullptr;
 
-const ClassProject::BDD_ID FASLE_ID = 0;
+const ClassProject::BDD_ID FALSE_ID = 0;
 const ClassProject::BDD_ID TRUE_ID = 1;
 const ClassProject::BDD_ID A = 2;
 const ClassProject::BDD_ID B = 3;
 const ClassProject::BDD_ID C = 4;
+const ClassProject::BDD_ID AandB = 4;
 const ClassProject::BDD_ID D = 5;
 const ClassProject::BDD_ID A_OR_B = 6;
 const ClassProject::BDD_ID C_AND_D = 7;
+const ClassProject::BDD_ID Invalid = 9999;
 
-// Example test case for the Manager module
-TEST_F(ManagerTest, False) {
-    EXPECT_EQ( obj->False(), FASLE_ID );
-}
-
+// checks the id for true label
 TEST_F(ManagerTest, TRUE) {
     EXPECT_EQ( obj->True(), TRUE_ID );
 }
+// checks the id for true label
+TEST_F(ManagerTest, FALSE) {
+    EXPECT_EQ( obj->False(), FALSE_ID );
+}
+// createVar()_S
+//valid label inputs for creating a ID
+TEST_F(ManagerTest, Createvar_validlabels_id) {
+    EXPECT_ANY_THROW( obj->createVar(" "));
+    EXPECT_ANY_THROW( obj->createVar("+"));
+    EXPECT_ANY_THROW( obj->createVar("^"));
+};
+//created var has a  valid BDD_ID
+TEST_F(ManagerTest, Createvar_invalid_id) {
+    EXPECT_EQ( obj->createVar("a"), A );
+};
+//same labels are refered with same BDDID
+TEST_F(ManagerTest, Createvar_SameIDforsameLabel)
+{
+    EXPECT_ANY_THROW(obj->createVar("a"));
+};
+//BDDID is different for non-identical labels and incremented
+TEST_F(ManagerTest, Createvar_UniQueidforlabel) {
+    const ClassProject::BDD_ID id2 = obj->createVar("b");
+    const ClassProject::BDD_ID id3 = obj->createVar("a+b");
+    EXPECT_NE(id2, id3);  // Ensure the IDs are different
+    EXPECT_EQ( id3, id2+1); // Ensre the incrementation
+};
+// end of createVar
 
-//         virtual BDD_ID createVar(const std::string &label) override {  // S
-//             return -1;
-//         };
 
-//         virtual bool isConstant(BDD_ID f) override {  // S
-//             return -1;
-//         };
+//isConstant_S
+TEST_F(ManagerTest, isConstant_invalidinput) {
+    EXPECT_ANY_THROW( obj->topVar(Invalid));
+}
+TEST_F(ManagerTest, isConstant_validreturn) {
+    EXPECT_EQ( obj->isConstant(TRUE_ID),true);
+    EXPECT_EQ( obj->isConstant(FALSE_ID),true);
+    EXPECT_EQ( obj->isConstant(A),false);
+}
+//end of isConstant
 
-//         virtual bool isVariable(BDD_ID x) override {  // S
-//             return -1;
-//         };
+//isVariable_
+TEST_F(ManagerTest, isVariable_invalidinput) {
+    EXPECT_ANY_THROW( obj->topVar(Invalid));
+}
+TEST_F(ManagerTest, isVariable_validreturn) {
+    EXPECT_EQ( obj->isVariable(TRUE_ID),false);
+    EXPECT_EQ( obj->isVariable(FALSE_ID),false);
+    EXPECT_EQ( obj->isVariable(B),true);
+};
+//end of isVariable
 
-//         virtual BDD_ID topVar(BDD_ID f) override {  // S
-//             return -1;
-//         };
+//topVar()
+//valid input
+TEST_F(ManagerTest, topvar_invalidinput) {
+    EXPECT_ANY_THROW( obj->topVar(Invalid));
+};
+//returns a valid BDD_ID
+TEST_F(ManagerTest, topvar_validreturn) {
+    EXPECT_NE( obj->topVar(TRUE_ID),Invalid);
+    EXPECT_EQ( obj->topVar(TRUE_ID),TRUE_ID);
+    EXPECT_EQ( obj->topVar(FALSE_ID),FALSE_ID);
+    EXPECT_EQ( obj->topVar(A),A);
+    EXPECT_EQ( obj->topVar(AandB),A);
+};
+//end of topvar
+
+//neg()_s
+
 
 //         virtual BDD_ID neg(BDD_ID a) override {  // S
 //             return -1;
@@ -98,7 +149,7 @@ TEST_F(ManagerTest, TRUE) {
 // Throws Exception when calling ite with an invalid BDD_ID
 TEST_F(ManagerTest, iteException) {
     ClassProject::BDD_ID Invalid_id = 9999;
-    EXPECT_ANY_THROW( obj->ite(Invalid_id , FASLE_ID , FASLE_ID));
+    EXPECT_ANY_THROW( obj->ite(Invalid_id , FALSE_ID , FALSE_ID));
 }
 
 // Terminal Case 1 Test
@@ -108,7 +159,7 @@ TEST_F(ManagerTest, iteTerminal1) {
 
 // Terminal Case 2 Test
 TEST_F(ManagerTest, iteTerminal2) {  
-    EXPECT_EQ( obj->ite(FASLE_ID , B , C) , C);
+    EXPECT_EQ( obj->ite(FALSE_ID , B , C) , C);
 }
 
 // Terminal Case 3 Test
@@ -118,12 +169,12 @@ TEST_F(ManagerTest, iteTerminal3) {
 
 // Terminal Case 4 Test
 TEST_F(ManagerTest, iteTerminal4) {  
-    EXPECT_EQ( obj->ite(B , TRUE_ID , FASLE_ID) , B);
+    EXPECT_EQ( obj->ite(B , TRUE_ID , FALSE_ID) , B);
 }
 
 // Terminal Case 5 Test
 TEST_F(ManagerTest, iteTerminal5) {  
-    EXPECT_EQ( obj->ite(B , FASLE_ID , FASLE_ID) , FASLE_ID);
+    EXPECT_EQ( obj->ite(B , FALSE_ID , FALSE_ID) , FALSE_ID);
 }
 
 // Terminal Case 6 Test
@@ -138,7 +189,7 @@ TEST_F(ManagerTest, iteAorB) {
 
 // C and D Case 7 Test
 TEST_F(ManagerTest, iteCandD) {  
-    EXPECT_EQ( obj->ite(C , D , FASLE_ID) , C_AND_D);
+    EXPECT_EQ( obj->ite(C , D , FALSE_ID) , C_AND_D);
 }
 
 
@@ -178,3 +229,4 @@ TEST_F(ManagerTest, iteCandD) {
 
 //         virtual void visualizeBDD(std::string filepath, BDD_ID &root) override {
 //         };
+
