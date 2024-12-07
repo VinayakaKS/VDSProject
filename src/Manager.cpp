@@ -85,6 +85,9 @@ BDD_ID Manager::ite(BDD_ID i, BDD_ID t, BDD_ID e)
     BDD_ID high, low;
     TableRow new_row_data;
 
+    if(i > return_lastID() || t > return_lastID() || e > return_lastID())
+        throw std::runtime_error("Invalid BDD_ID");
+
     //check for terminal cases
     if(i==1) return t; //ite(1,t,e)
     if(i==0) return e; //ite(0,t,e)
