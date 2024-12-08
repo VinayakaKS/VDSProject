@@ -170,11 +170,7 @@ TEST_F(ManagerTest, topvar_validreturn) {
 //         };
 
 
-//         virtual BDD_ID ite(BDD_ID i, BDD_ID t, BDD_ID e) override {  // N
-//             return -1;
-//         };
-
-
+//////////  START OF ITE   ////////////
 //Throws Exception when calling ite with an invalid BDD_ID
 TEST_F(ManagerTest, iteException) {
     EXPECT_ANY_THROW( obj->ite(Invalid , FALSE_ID , FALSE_ID));
@@ -220,13 +216,11 @@ TEST_F(ManagerTest, iteCandD) {
     EXPECT_EQ( obj->ite(C , D , FALSE_ID) , C_AND_D);
     obj->print_table();
 }
+//////////  END OF ITE   ////////////
 
 
-// virtual BDD_ID coFactorTrue(BDD_ID f, BDD_ID x) override {  // N
-//     return -1;
-// };
 
-
+//////////  START OF COFACTOR TRUE 2 Parameters   ////////////
 TEST_F(ManagerTest, coFactorTrueInvalidId) {  
     EXPECT_ANY_THROW( obj->coFactorTrue(A_OR_B , Invalid));
 }
@@ -242,12 +236,10 @@ TEST_F(ManagerTest, coFactorTrueTopVariable) {
 TEST_F(ManagerTest, coFactorTrueNotTopVariable) {  
     EXPECT_EQ( obj->coFactorTrue(C_AND_D , A) , C_AND_D);
 }
+//////////  END OF COFACTOR TRUE 2 Parameters   ////////////
 
 
-//         virtual BDD_ID coFactorFalse(BDD_ID f, BDD_ID x) override {  // N
-//             return -1;
-//         };
-
+//////////  START OF COFACTOR FALSE 2 Parameters   ////////////
 TEST_F(ManagerTest, coFactorFalseInvalidId) {  
     EXPECT_ANY_THROW( obj->coFactorFalse(A_OR_B , Invalid));
 }
@@ -263,13 +255,10 @@ TEST_F(ManagerTest, coFactorFalseTopVariable) {
 TEST_F(ManagerTest, coFactorFalseNotTopVariable) {  
     EXPECT_EQ( obj->coFactorFalse(A_OR_B , C) , A_OR_B);
 }
+//////////  END OF COFACTOR FALSE 2 Parameters   ////////////
 
 
-
-//         virtual BDD_ID coFactorTrue(BDD_ID f) override {  // N
-//             return -1;
-//         };
-
+//////////  START OF COFACTOR TRUE 1  Parameter   ////////////
 TEST_F(ManagerTest, coFactorTrueInvalidIdTop) {  
     EXPECT_ANY_THROW( obj->coFactorTrue(Invalid));
 }
@@ -277,11 +266,10 @@ TEST_F(ManagerTest, coFactorTrueInvalidIdTop) {
 TEST_F(ManagerTest, coFactorTrueTop) {  
     EXPECT_EQ( obj->coFactorTrue(A_OR_B) , TRUE_ID);
 }
+//////////  END OF COFACTOR TRUE 1  Parameter   ////////////
 
-//         virtual BDD_ID coFactorFalse(BDD_ID f) override {  // N
-//             return -1;
-//         };
 
+//////////  START OF COFACTOR FALSE 1  Parameter   ////////////
 TEST_F(ManagerTest, coFactorFalseInvalidIdTop) {  
     EXPECT_ANY_THROW( obj->coFactorFalse(Invalid));
 }
@@ -289,13 +277,14 @@ TEST_F(ManagerTest, coFactorFalseInvalidIdTop) {
 TEST_F(ManagerTest, coFactorFalseTop) {  
     EXPECT_EQ( obj->coFactorFalse(A_OR_B) , B);
 }
+//////////  END OF COFACTOR FALSE 1  Parameter   ////////////
 
 
-// Final Test for Top Var after introducing functions with ite
+//////////  Final Test for Top Var after introducing functions with ite   ////////////
 TEST_F(ManagerTest, topVarFunction) {  
     EXPECT_EQ( obj->topVar(A_OR_B),A);
 }
-
+//////////  END OF TOPVAR  ////////////
 
 //         virtual BDD_ID and2(BDD_ID a, BDD_ID b) override {  // N
 //             return -1;
