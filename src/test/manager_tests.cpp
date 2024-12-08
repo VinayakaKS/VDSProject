@@ -195,6 +195,8 @@ TEST_F(ManagerTest, iteCandD) {
 
 
 
+
+
 //         virtual BDD_ID coFactorTrue(BDD_ID f, BDD_ID x) override {  // N
 //             return -1;
 //         };
