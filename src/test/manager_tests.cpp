@@ -263,6 +263,13 @@ TEST_F(ManagerTest, coFactorFalseTop) {
     EXPECT_EQ( obj->coFactorFalse(A_OR_B) , B);
 }
 
+
+// Final Test for Top Var after introducing functions with ite
+TEST_F(ManagerTest, topVarFunction) {  
+    EXPECT_EQ( obj->topVar(A_OR_B),A);
+}
+
+
 //         virtual BDD_ID and2(BDD_ID a, BDD_ID b) override {  // N
 //             return -1;
 //         };
