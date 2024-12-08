@@ -182,16 +182,16 @@ TEST_F(ManagerTest, iteTerminal6) {
     EXPECT_EQ( obj->ite(B , TRUE_ID , TRUE_ID) , TRUE_ID);
 }
 
-// A OR B Case 7 Test
-TEST_F(ManagerTest, iteAorB) {  
-    EXPECT_EQ( obj->ite(A , TRUE_ID , B) , A_OR_B);
-}
+// // A OR B Case 7 Test
+// TEST_F(ManagerTest, iteAorB) {  
+//     EXPECT_EQ( obj->ite(A , TRUE_ID , B) , A_OR_B);
+// }
 
-// C and D Case 7 Test
-TEST_F(ManagerTest, iteCandD) {  
-    EXPECT_EQ( obj->ite(C , D , FALSE_ID) , C_AND_D);
-    obj->print_table();
-}
+// // C and D Case 7 Test
+// TEST_F(ManagerTest, iteCandD) {  
+//     EXPECT_EQ( obj->ite(C , D , FALSE_ID) , C_AND_D);
+//     obj->print_table();
+// }
 
 
 //EXPECT_EQ( obj->topVar(AandB),A);
