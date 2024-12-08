@@ -93,7 +93,7 @@ namespace ClassProject {
         }
 
         int return_lastID(){
-            return unique_table.last_id-1;
+            return unique_table.last_id-1-1;
         }
 
         TableRow* getData(BDD_ID f) {
