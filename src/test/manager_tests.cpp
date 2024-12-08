@@ -193,8 +193,6 @@ TEST_F(ManagerTest, iteCandD) {
 }
 
 
-//EXPECT_EQ( obj->topVar(AandB),A);
-
 // virtual BDD_ID coFactorTrue(BDD_ID f, BDD_ID x) override {  // N
 //     return -1;
 // };

@@ -88,5 +88,10 @@ class DynamicTable {
                 std::cout << row.id << "\t" << row.label << "\t" << row.high << "\t" << row.low << "\t" << row.topVar << "\n";
             }
         }
+
+        // Display the table
+        size_t tableSize() {
+            return UniqueTable.size();
+        }
 };
 
