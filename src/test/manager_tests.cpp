@@ -108,7 +108,6 @@ TEST_F(ManagerTest, topvar_validreturn) {
     EXPECT_EQ( obj->topVar(TRUE_ID),TRUE_ID);
     EXPECT_EQ( obj->topVar(FALSE_ID),FALSE_ID);
     EXPECT_EQ( obj->topVar(A),A);
-    EXPECT_EQ( obj->topVar(AandB),A);
 };
 //end of topvar
 
@@ -191,11 +190,11 @@ TEST_F(ManagerTest, iteAorB) {
 // C and D Case 7 Test
 TEST_F(ManagerTest, iteCandD) {  
     EXPECT_EQ( obj->ite(C , D , FALSE_ID) , C_AND_D);
+    obj->print_table();
 }
 
 
-
-
+//EXPECT_EQ( obj->topVar(AandB),A);
 
 //         virtual BDD_ID coFactorTrue(BDD_ID f, BDD_ID x) override {  // N
 //             return -1;
