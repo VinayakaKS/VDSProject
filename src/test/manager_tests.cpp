@@ -8,26 +8,35 @@
 class ManagerTest : public ::testing::Test {
 protected:
     static ClassProject::Manager* obj;
-    static ClassProject::Manager* obj2;
+    ClassProject::Manager* temp_obj;
+
+    void SetUp() override {
+        if (temp_obj == nullptr) {
+            temp_obj = new ClassProject::Manager();  // Create object for each test case
+        }
+    }
+
+    void TearDown() override {
+        if (temp_obj != nullptr) {
+            delete temp_obj;  // Manually delete unique object after each test case
+            temp_obj = nullptr;
+        }
+    }
 
     static void SetUpTestSuite() {
         std::cout << "Setting up test suite\n";
         obj = new ClassProject::Manager(); // Initialize once for all tests
-        obj2 = new ClassProject::Manager(); // Initialize once for all tests
         std::cout << "obj initialized: " << obj << "\n";
     }
 
     static void TearDownTestSuite() {
         std::cout << "Tearing down test suite\n";
         delete obj;
-        delete obj2;
         obj = nullptr;
-        obj2 = nullptr;
     }
 };
 
 ClassProject::Manager* ManagerTest::obj = nullptr;
-ClassProject::Manager* ManagerTest::obj2 = nullptr;
 
 const ClassProject::BDD_ID FALSE_ID = 0;
 const ClassProject::BDD_ID TRUE_ID = 1;
@@ -39,6 +48,8 @@ const ClassProject::BDD_ID D = 5;
 const ClassProject::BDD_ID A_OR_B = 6;
 const ClassProject::BDD_ID C_AND_D = 7;
 const ClassProject::BDD_ID Invalid = 9999;
+//test to create a table to test my values
+
 
 // checks the id for true label
 TEST_F(ManagerTest, TRUE) {
@@ -69,9 +80,22 @@ TEST_F(ManagerTest, Createvar_UniQueidforlabel) {
     const ClassProject::BDD_ID id2 = obj->createVar("b");
     const ClassProject::BDD_ID id3 = obj->createVar("a+b");
     EXPECT_NE(id2, id3);  // Ensure the IDs are different
-    EXPECT_EQ( id3, id2+1); // Ensre the incrementation
+    EXPECT_EQ( id3, id2+1); // Ensure the incrementation
 };
-// end of createVar
+//uniqueTableSize()
+TEST_F(ManagerTest,uniqueTableSize)
+{
+    EXPECT_NE( obj->uniqueTableSize(),9999999999+1);// check for terminal case
+    EXPECT_EQ( temp_obj->uniqueTableSize(), 2);// check for the terminal case
+    EXPECT_EQ( obj->uniqueTableSize(),5 );// check for the correct size
+};
+//check deletetable
+/*TEST_F(ManagerTest, table_deletion)
+{
+    obj->delete_table();
+    EXPECT_EQ(obj->uniqueTableSize(), 2);
+}*/
+// end of delete table
 
 
 //isConstant_S
@@ -93,7 +117,7 @@ TEST_F(ManagerTest, isVariable_validreturn) {
     obj->print_table();
     EXPECT_EQ( obj->isVariable(TRUE_ID),false);
     EXPECT_EQ( obj->isVariable(FALSE_ID),false);
-    EXPECT_EQ( obj->isVariable(B),true);
+    EXPECT_EQ( obj->isVariable(A),true);
 };
 // //end of isVariable
 
@@ -112,6 +136,10 @@ TEST_F(ManagerTest, topvar_validreturn) {
 //end of topvar
 
 //neg()_s
+/*TEST_F(ManagerTest,negation_check)
+{
+    EXPECT_ANY_THROW( obj->neg(A));
+}*/
 
 
 //         virtual BDD_ID neg(BDD_ID a) override {  // S
@@ -135,6 +163,7 @@ TEST_F(ManagerTest, topvar_validreturn) {
 
 //         virtual void findVars(const BDD_ID &root, std::set<BDD_ID> &vars_of_root) override {  // S
 //         };
+
 
 //         virtual size_t uniqueTableSize() override {  // S
 //             return -1;
@@ -286,5 +315,5 @@ TEST_F(ManagerTest, topVarFunction) {
 //         };
 
 //         virtual void visualizeBDD(std::string filepath, BDD_ID &root) override {
-//         };
+//         }; not included
 

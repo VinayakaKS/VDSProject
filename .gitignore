@@ -1,4 +1,6 @@
 gtest/
 build/
 .vscode/
+cmake-build-debug/
+.idea/
 src/ManagerNotes.h
