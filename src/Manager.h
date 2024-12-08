@@ -49,17 +49,11 @@ namespace ClassProject {
 
         virtual BDD_ID coFactorFalse(BDD_ID f);
 
-        virtual BDD_ID and2(BDD_ID a, BDD_ID b) override {
-            return -1;
-        };
+        virtual BDD_ID and2(BDD_ID a, BDD_ID b);
 
-        virtual BDD_ID or2(BDD_ID a, BDD_ID b) override {
-            return -1; //ite(a,1,b)
-        };
+        virtual BDD_ID or2(BDD_ID a, BDD_ID b);
 
-        virtual BDD_ID xor2(BDD_ID a, BDD_ID b) override {
-            return -1;
-        };
+        virtual BDD_ID xor2(BDD_ID a, BDD_ID b);
 
         virtual BDD_ID neg(BDD_ID a) override {
             return -1;
@@ -99,7 +93,7 @@ namespace ClassProject {
         }
 
         int return_lastID(){
-            return unique_table.last_id;
+            return unique_table.last_id-1;
         }
 
         TableRow* getData(BDD_ID f) {

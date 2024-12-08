@@ -46,7 +46,7 @@ class DynamicTable {
 
             TableRow data = {last_id, row_data->label,row_data->high,row_data->low,row_data->topVar};
             UniqueTable.push_back(data);
-            cout<< "added a row - "<< last_id<< " "<<row_data->label;
+            cout<< "Row added - "<< last_id<< " "<<row_data->label <<endl;
             idMap[last_id++] = UniqueTable.size() - 1;
             labelMap[row_data->label] = UniqueTable.size() - 1;
             return (last_id - 1);
@@ -83,9 +83,9 @@ class DynamicTable {
 
         // Display the table
         void displayTable() const {
-            std::cout << "BDD_ID\tLabel\tHigh\tLow\tTopVar\n";
+            std::cout << endl << "BDD_ID\tLabel\t\t\tHigh\tLow\tTopVar\n";
             for (const auto &row : UniqueTable) {
-                std::cout << row.id << "\t" << row.label << "\t" << row.high << "\t" << row.low << "\t" << row.topVar << "\n";
+                std::cout << row.id << "\t" << row.label << "\t\t\t" << row.high << "\t" << row.low << "\t" << row.topVar << "\n";
             }
         }
 
