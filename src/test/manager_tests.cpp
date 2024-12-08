@@ -286,17 +286,55 @@ TEST_F(ManagerTest, topVarFunction) {
 }
 //////////  END OF TOPVAR  ////////////
 
-//         virtual BDD_ID and2(BDD_ID a, BDD_ID b) override {  // N
-//             return -1;
-//         };
 
-//         virtual BDD_ID or2(BDD_ID a, BDD_ID b) override { // N
-//             return -1;
-//         };
+//////////  START OF and2   ////////////
+TEST_F(ManagerTest, and2InvalidInput) {  
+    EXPECT_ANY_THROW( temp_obj->and2(Invalid , Invalid) );
+}
 
-//         virtual BDD_ID xor2(BDD_ID a, BDD_ID b) override { // N
-//             return -1;
-//         };
+TEST_F(ManagerTest, and2Works) {  
+    temp_obj->createVar("a");
+    temp_obj->createVar("b");
+    ClassProject::BDD_ID new_id = temp_obj->and2(A , B);
+    EXPECT_EQ( temp_obj->getData(new_id)->high , B );
+    EXPECT_EQ( temp_obj->getData(new_id)->low , FALSE_ID );
+    EXPECT_EQ( temp_obj->getData(new_id)->topVar , A );
+}
+//////////  END OF and2   ////////////
+
+
+//////////  START OF or2   ////////////
+TEST_F(ManagerTest, or2InvalidInput) {  
+    EXPECT_ANY_THROW( temp_obj->or2(Invalid , Invalid) );
+}
+
+TEST_F(ManagerTest, or2Works) {  
+    temp_obj->createVar("a");
+    temp_obj->createVar("b");
+    ClassProject::BDD_ID new_id = temp_obj->or2(A , B);
+    EXPECT_EQ( temp_obj->getData(new_id)->high , TRUE_ID );
+    EXPECT_EQ( temp_obj->getData(new_id)->low , B );
+    EXPECT_EQ( temp_obj->getData(new_id)->topVar , A );
+}
+//////////  END OF or2   ////////////
+
+//////////  START OF xor2   ////////////
+TEST_F(ManagerTest, xor2InvalidInput) {  
+    EXPECT_ANY_THROW( temp_obj->xor2(Invalid , Invalid) );
+}
+
+TEST_F(ManagerTest, xor2Works) {  
+    temp_obj->createVar("a");
+    temp_obj->createVar("b");
+    ClassProject::BDD_ID new_id = temp_obj->xor2(A , B);
+    EXPECT_EQ( temp_obj->getData(new_id - 1)->high , FALSE_ID );
+    EXPECT_EQ( temp_obj->getData(new_id - 1)->low , TRUE_ID );
+    EXPECT_EQ( temp_obj->getData(new_id - 1)->topVar , B );
+    EXPECT_EQ( temp_obj->getData(new_id)->high , (new_id - 1) );
+    EXPECT_EQ( temp_obj->getData(new_id)->low , B );
+    EXPECT_EQ( temp_obj->getData(new_id)->topVar , A );
+}
+//////////  END OF xor2   ////////////
 
 
 //         virtual std::string getTopVarName(const BDD_ID &root) override {  // N

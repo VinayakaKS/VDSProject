@@ -102,6 +102,15 @@ namespace ClassProject {
             return unique_table.last_id;
         }
 
+        TableRow* getData(BDD_ID f) {
+            TableRow* tr = unique_table.getRowById(f); 
+            if(&tr) {
+                return tr;
+            } else {
+                throw std::runtime_error("Row with this id does not exist.");
+            }
+        }
+
     private:
         DynamicTable unique_table;
         const BDD_ID FALSE_ROW = 0;
