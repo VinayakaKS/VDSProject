@@ -98,6 +98,10 @@ namespace ClassProject {
             unique_table.displayTable();
         }
 
+        int return_lastID(){
+            return unique_table.last_id;
+        }
+
     private:
         DynamicTable unique_table;
         const BDD_ID FALSE_ROW = 0;

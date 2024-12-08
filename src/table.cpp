@@ -27,9 +27,9 @@ class DynamicTable {
     vector<TableRow> UniqueTable;             // Stores rows in Unique table
     unordered_map<size_t, size_t> idMap;         // Maps id to index in `UniqueTable` for fast lookup
     unordered_map<string, size_t> labelMap;         // Maps id to index in `UniqueTable` for fast lookup
-    size_t last_id = 0;
 
     public:
+        size_t last_id = 0;
         // Add a row to the table 
         size_t addRow(TableRow *row_data) {
             if(row_data->topVar == LIMIT) {
