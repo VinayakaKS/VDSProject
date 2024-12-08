@@ -104,7 +104,7 @@ namespace ClassProject {
 
         TableRow* getData(BDD_ID f) {
             TableRow* tr = unique_table.getRowById(f); 
-            if(&tr) {
+            if(tr) {
                 return tr;
             } else {
                 throw std::runtime_error("Row with this id does not exist.");

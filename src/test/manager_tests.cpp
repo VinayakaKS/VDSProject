@@ -11,16 +11,12 @@ protected:
     ClassProject::Manager* temp_obj;
 
     void SetUp() override {
-        if (temp_obj == nullptr) {
-            temp_obj = new ClassProject::Manager();  // Create object for each test case
-        }
+        temp_obj = new ClassProject::Manager();  // Create object for each test case
     }
 
     void TearDown() override {
-        if (temp_obj != nullptr) {
-            delete temp_obj;  // Manually delete unique object after each test case
-            temp_obj = nullptr;
-        }
+        delete temp_obj;  // Manually delete unique object after each test case
+        temp_obj = nullptr;
     }
 
     static void SetUpTestSuite() {
@@ -296,9 +292,10 @@ TEST_F(ManagerTest, and2Works) {
     temp_obj->createVar("a");
     temp_obj->createVar("b");
     ClassProject::BDD_ID new_id = temp_obj->and2(A , B);
-    EXPECT_EQ( temp_obj->getData(new_id)->high , B );
-    EXPECT_EQ( temp_obj->getData(new_id)->low , FALSE_ID );
-    EXPECT_EQ( temp_obj->getData(new_id)->topVar , A );
+    TableRow* data = temp_obj->getData(new_id);
+    EXPECT_EQ(data->high , B );
+    EXPECT_EQ( data->low , FALSE_ID );
+    EXPECT_EQ( data->topVar , A );
 }
 //////////  END OF and2   ////////////
 
