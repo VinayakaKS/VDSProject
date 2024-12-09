@@ -18,7 +18,7 @@ BDD_ID Manager::createVar(const std::string &label) {
         TableRow new_var = { 0 , label};
         return unique_table.addRow(&new_var);
     }
-};
+}
 
 bool Manager::isConstant(BDD_ID f) {
     TableRow* tr = unique_table.getRowById(f);
@@ -27,7 +27,7 @@ bool Manager::isConstant(BDD_ID f) {
     } else {
         throw std::runtime_error("Row with this id does not exist.");
     }
-};
+}
 
 bool Manager::isVariable(BDD_ID x) {
     TableRow* tr = unique_table.getRowById(x); 
@@ -36,7 +36,7 @@ bool Manager::isVariable(BDD_ID x) {
     } else {
         throw std::runtime_error("Row with this id does not exist.");
     }
-};
+}
 
 BDD_ID Manager::topVar(BDD_ID f) {
     TableRow* tr = unique_table.getRowById(f); 
@@ -45,7 +45,7 @@ BDD_ID Manager::topVar(BDD_ID f) {
     } else {
         throw std::runtime_error("Row with this id does not exist.");
     }
-};
+}
 
 
 BDD_ID Manager::coFactorTrue(BDD_ID f, BDD_ID x){
@@ -62,7 +62,7 @@ BDD_ID Manager::coFactorTrue(BDD_ID f, BDD_ID x){
     }
         
     else return f;//vfo ite(x,f,0)
-};
+}
 
 BDD_ID Manager::coFactorFalse(BDD_ID f, BDD_ID x){
     if(f > return_lastID() || x > return_lastID())
@@ -79,21 +79,21 @@ BDD_ID Manager::coFactorFalse(BDD_ID f, BDD_ID x){
     }
         
     else return f;//v0f ite(x,0,f)
-};
+}
 
 BDD_ID Manager::coFactorTrue(BDD_ID f){
     if(f > return_lastID())
         throw std::runtime_error("Invalid BDD_ID");
         
     return unique_table.getRowById(f)->high;
-};
+}
 
 BDD_ID Manager::coFactorFalse(BDD_ID f){
     if(f > return_lastID())
         throw std::runtime_error("Invalid BDD_ID");
 
     return unique_table.getRowById(f)->low;
-};
+}
 
 
 BDD_ID Manager::ite(BDD_ID i, BDD_ID t, BDD_ID e)  //i*t+ibar*e
@@ -152,28 +152,46 @@ BDD_ID Manager::ite(BDD_ID i, BDD_ID t, BDD_ID e)  //i*t+ibar*e
         label_storage = "";
         return unique_table.addRow(&new_row_data); 
     }
-};
+}
 
 
 BDD_ID Manager::and2(BDD_ID a, BDD_ID b) //ite(a,b,0)
 {
+    if(a > return_lastID() || b > return_lastID())
+        throw std::runtime_error("Invalid BDD_ID given for and operation");
+
     label_storage = unique_table.getRowById(a)->label + " and " + unique_table.getRowById(b)->label; 
     return ite(a,b,0);
-};
+}
 
 BDD_ID Manager::or2(BDD_ID a, BDD_ID b) //ite(a,1,b)
 {
+    if(a > return_lastID() || b > return_lastID())
+        throw std::runtime_error("Invalid BDD_ID given for or operation");
+
     label_storage = unique_table.getRowById(a)->label + " or " + unique_table.getRowById(b)->label; 
     return ite(a,1,b);
-};
+}
 
 BDD_ID Manager::xor2(BDD_ID a, BDD_ID b) //ite(a,neg_b,b)
 {
+    if(a > return_lastID() || b > return_lastID())
+        throw std::runtime_error("Invalid BDD_ID given for xor operation");
+
     BDD_ID neg_b = neg(b);
     label_storage = unique_table.getRowById(a)->label + " xor " + unique_table.getRowById(b)->label; 
     return ite(a,neg_b,b);
-};
+}
+
+string Manager::getTopVarName(const BDD_ID &root)
+{
+    TableRow* topVariable = unique_table.getRowById(root);
+    if(topVariable == nullptr)
+        throw std::runtime_error("Invalid BDD_ID given");
+    else
+        return unique_table.getRowById(topVariable->topVar)->label;
+}
 
 size_t Manager::uniqueTableSize() {
     return unique_table.tableSize();
-};
+}

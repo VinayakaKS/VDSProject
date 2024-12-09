@@ -71,9 +71,7 @@ namespace ClassProject {
             return -1;
         };
 
-        virtual std::string getTopVarName(const BDD_ID &root) override {
-            return "-1";
-        };
+        virtual std::string getTopVarName(const BDD_ID &root);
 
         virtual void findNodes(const BDD_ID &root, std::set<BDD_ID> &nodes_of_root) override {
         };
