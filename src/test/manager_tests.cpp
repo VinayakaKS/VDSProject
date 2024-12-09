@@ -357,8 +357,9 @@ TEST_F(ManagerTest, getTopVarNameofVariable) {
 }
 
 TEST_F(ManagerTest, getTopVarNameofNode) {  
-    EXPECT_EQ( obj->getTopVarName(A_OR_B), "a+b" );
-    EXPECT_EQ( obj->getTopVarName(C_AND_D), "c*d" );
+    obj->print_table();
+    EXPECT_EQ( obj->getTopVarName(A_OR_B), "a" );
+    EXPECT_EQ( obj->getTopVarName(C_AND_D), "c" );
 }
 //////////  END OF getTopVarName   ////////////
 
