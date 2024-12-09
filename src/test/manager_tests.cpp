@@ -3,6 +3,7 @@
 //
 
 #include "Tests.h"
+#include <set>
 
 // Test fixture
 class ManagerTest : public ::testing::Test {
@@ -43,7 +44,10 @@ const ClassProject::BDD_ID AandB = 4;
 const ClassProject::BDD_ID D = 5;
 const ClassProject::BDD_ID A_OR_B = 6;
 const ClassProject::BDD_ID C_AND_D = 7;
+const ClassProject::BDD_ID G = 8;
+const ClassProject::BDD_ID F = 9;
 const ClassProject::BDD_ID Invalid = 9999;
+ClassProject::set <ClassProject::BDD_ID> non_empty_set_nodes = {10, 20};
 //test to create a table to test my values
 
 
@@ -85,14 +89,6 @@ TEST_F(ManagerTest,uniqueTableSize)
     EXPECT_EQ( temp_obj->uniqueTableSize(), 2);// check for the terminal case
     EXPECT_EQ( obj->uniqueTableSize(),5 );// check for the correct size
 };
-//check deletetable
-/*TEST_F(ManagerTest, table_deletion)
-{
-    obj->delete_table();
-    EXPECT_EQ(obj->uniqueTableSize(), 2);
-}*/
-// end of delete table
-
 
 //isConstant_S
 TEST_F(ManagerTest, isConstant_invalidinput) {
@@ -131,41 +127,120 @@ TEST_F(ManagerTest, topvar_validreturn) {
 };
 //end of topvar
 
-//neg()_s
-/*TEST_F(ManagerTest,negation_check)
+//////////  START OF neg  ////////////
+
+TEST_F(ManagerTest, negInvalidInput) {
+    EXPECT_ANY_THROW( temp_obj->neg(Invalid) );
+}
+
+TEST_F(ManagerTest, negWorks)
 {
-    EXPECT_ANY_THROW( obj->neg(A));
-}*/
+    temp_obj->createVar("a");
+    temp_obj->createVar("b");
+    ClassProject::BDD_ID new_id = temp_obj->neg(A);
+    EXPECT_EQ( temp_obj->getData(new_id)->high , FALSE_ID );
+    EXPECT_EQ( temp_obj->getData(new_id)->low , TRUE_ID );
+    EXPECT_EQ( temp_obj->getData(new_id)->topVar , A ); // points to the root variable
+};
+
+//////////  END OF neg  ////////////
 
 
-//         virtual BDD_ID neg(BDD_ID a) override {  // S
-//             return -1;
-//         };
+//////////  START OF nand2  ////////////
+TEST_F(ManagerTest, nand2InvalidInput) {
+    EXPECT_ANY_THROW( temp_obj->nand2(Invalid, Invalid) );
+}
 
-//         virtual BDD_ID nand2(BDD_ID a, BDD_ID b) override {  // S
-//             return -1;
-//         };
-
-//         virtual BDD_ID nor2(BDD_ID a, BDD_ID b) override {  // S
-//             return -1;
-//         };
-
-//         virtual BDD_ID xnor2(BDD_ID a, BDD_ID b) override {  // S
-//             return -1;
-//         };
-
-//         virtual void findNodes(const BDD_ID &root, std::set<BDD_ID> &nodes_of_root) override {  // S
-//         };
-
-//         virtual void findVars(const BDD_ID &root, std::set<BDD_ID> &vars_of_root) override {  // S
-//         };
+TEST_F(ManagerTest, nand2Works)
+{
+    temp_obj->createVar("a");
+    temp_obj->createVar("b");
+    ClassProject::BDD_ID new_id = temp_obj-> nand2(A, B);
+    EXPECT_EQ( temp_obj->getData(new_id - 1)->high , FALSE_ID );
+    EXPECT_EQ( temp_obj->getData(new_id - 1)->low , TRUE_ID );
+    EXPECT_EQ( temp_obj->getData(new_id - 1)->topVar , B );
+    EXPECT_EQ( temp_obj->getData(new_id)->high , (new_id - 1) );
+    EXPECT_EQ( temp_obj->getData(new_id)->low , TRUE_ID );
+    EXPECT_EQ( temp_obj->getData(new_id)->topVar , A );
+};
+//////////  END OF nand2  ////////////
 
 
-//         virtual size_t uniqueTableSize() override {  // S
-//             return -1;
-//         };
+//////////  START OF NOR ////////////
+TEST_F(ManagerTest, nor2InvalidInput) {
+    EXPECT_ANY_THROW( temp_obj->nor2(Invalid, Invalid) );
+}
+
+TEST_F(ManagerTest, nor2Works)
+{
+    temp_obj->createVar("a");
+    temp_obj->createVar("b");
+    ClassProject::BDD_ID new_id = temp_obj-> nor2(A, B);
+    EXPECT_EQ( temp_obj->getData(new_id - 1)->high , FALSE_ID );
+    EXPECT_EQ( temp_obj->getData(new_id - 1)->low , TRUE_ID );
+    EXPECT_EQ( temp_obj->getData(new_id - 1)->topVar , B );
+    EXPECT_EQ( temp_obj->getData(new_id)->high , FALSE_ID );
+    EXPECT_EQ( temp_obj->getData(new_id)->low , (new_id - 1) );
+    EXPECT_EQ( temp_obj->getData(new_id)->topVar , A );
+};
+//////////  END OF nor2  ////////////
+
+//////////  START OF xnor2   ////////////
+TEST_F(ManagerTest, xonr2InvalidInput) {
+    EXPECT_ANY_THROW( temp_obj->xor2(Invalid , Invalid) );
+}
+
+TEST_F(ManagerTest, xnor2Works) {
+    temp_obj->createVar("a");
+    temp_obj->createVar("b");
+    ClassProject::BDD_ID new_id = temp_obj->xnor2(A , B);
+    EXPECT_EQ( temp_obj->getData(new_id - 1)->high , FALSE_ID );
+    EXPECT_EQ( temp_obj->getData(new_id - 1)->low , TRUE_ID );
+    EXPECT_EQ( temp_obj->getData(new_id - 1)->topVar , B );
+    EXPECT_EQ( temp_obj->getData(new_id)->high , B );
+    EXPECT_EQ( temp_obj->getData(new_id)->low ,(new_id - 1));
+    EXPECT_EQ( temp_obj->getData(new_id)->topVar , A );
+}
+//////////  END OF nor2   ////////////
 
 
+//////////  START OF findNodes  ////////////
+TEST_F(ManagerTest, findNodes_InvalidInput) {
+    EXPECT_ANY_THROW( temp_obj->findNodes(Invalid , non_empty_set_nodes) );
+}
+
+TEST_F(ManagerTest, findNodes_work)
+{
+    temp_obj-> and2(or2(A, B), and2(C, D));
+    ClassProject:: set <ClassProject::BDD_ID> nodes_of_root;
+    temp_obj-> findNodes(F,nodes_of_root);
+    EXPECT_NE(nodes_of_root.find(G), nodes_of_root.end());// should contain id8
+    EXPECT_NE(nodes_of_root.find(C_AND_D), nodes_of_root.end()); // should contain id7
+    EXPECT_NE(nodes_of_root.find(D), nodes_of_root.end()); // should contain id5
+    EXPECT_NE(nodes_of_root.find(F), nodes_of_root.end());// should contain itself
+    EXPECT_EQ(nodes_of_root.size(), 6);
+}
+
+//////////  END OF findNodes  ////////////
+
+//////////  START OF findVars////////////
+TEST_F(ManagerTest, findVars_InvalidInput) {
+    EXPECT_ANY_THROW( temp_obj->findNodes(Invalid , non_empty_set_nodes) );
+}
+
+TEST_F(ManagerTest, findVars_work)
+{
+    temp_obj-> and2(or2(A, B), and2(C, D));
+    ClassProject:: set <ClassProject::BDD_ID> vars_of_root;
+    temp_obj-> findNodes(F,vars_of_root);
+    EXPECT_NE(vars_of_root.find(A), vars_of_root.end());// should contain id2
+    EXPECT_NE(vars_of_root.find(B), vars_of_root.end()); // should contain id3
+    EXPECT_NE(vars_of_root.find(C), vars_of_root.end()); // should contain id4
+    EXPECT_NE(vars_of_root.find(D), vars_of_root.end());// should contain id5
+    EXPECT_EQ(vars_of_root.find(TRUE_ID), vars_of_root.end());// should not contain True_id
+    EXPECT_EQ(vars_of_root.find(FALSE_ID), vars_of_root.end());// should not contain False_id
+    EXPECT_EQ(vars_of_root.size(), 4);
+}
 //////////  START OF ITE   ////////////
 //Throws Exception when calling ite with an invalid BDD_ID
 TEST_F(ManagerTest, iteException) {
@@ -332,6 +407,18 @@ TEST_F(ManagerTest, xor2Works) {
     EXPECT_EQ( temp_obj->getData(new_id)->topVar , A );
 }
 //////////  END OF xor2   ////////////
+
+TEST_F(ManagerTest, getTopVarName_valid) {
+    EXPECT_ANY_THROW(temp_obj->getTopVarName(Invalid));
+}
+
+TEST_F(ManagerTest, getTopVarName_works){
+    temp_obj-> and2(A,B);
+    EXPECT_EQ(temp_obj->getTopVarName(AandB), A);
+    EXPECT_EQ(temp_obj->getTopVarName(TRUE_ID), TRUE_ID);
+}
+
+
 
 
 //         virtual std::string getTopVarName(const BDD_ID &root) override {  // N

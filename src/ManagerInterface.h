@@ -11,6 +11,8 @@
 namespace ClassProject {
 
     typedef size_t BDD_ID;
+    template <typename T>
+    using set = std::set<T>;
 
     class ManagerInterface {
     public:
@@ -59,6 +61,7 @@ namespace ClassProject {
         virtual size_t uniqueTableSize() = 0;
 
         virtual void visualizeBDD(std::string filepath, BDD_ID &root) = 0;
+
     };
 }
 
