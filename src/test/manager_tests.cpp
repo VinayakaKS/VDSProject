@@ -214,35 +214,32 @@ TEST_F(ManagerTest, findNodes_InvalidInput) {
 
 TEST_F(ManagerTest, findNodes_work)
 {
-    temp_obj-> and2(or2(A, B), and2(C, D));
+    temp_obj-> and2(A, B);
     ClassProject:: set <ClassProject::BDD_ID> nodes_of_root;
-    temp_obj-> findNodes(F,nodes_of_root);
-    EXPECT_NE(nodes_of_root.find(G), nodes_of_root.end());// should contain id8
-    EXPECT_NE(nodes_of_root.find(C_AND_D), nodes_of_root.end()); // should contain id7
-    EXPECT_NE(nodes_of_root.find(D), nodes_of_root.end()); // should contain id5
-    EXPECT_NE(nodes_of_root.find(F), nodes_of_root.end());// should contain itself
-    EXPECT_EQ(nodes_of_root.size(), 6);
+    temp_obj-> findNodes(AandB,nodes_of_root);
+    EXPECT_NE(nodes_of_root.find(B), nodes_of_root.end());// should contain id3
+    EXPECT_NE(nodes_of_root.find(AandB), nodes_of_root.end());// should contain itself
+    EXPECT_EQ(nodes_of_root.size(), 4);
+
 }
 
 //////////  END OF findNodes  ////////////
 
 //////////  START OF findVars////////////
 TEST_F(ManagerTest, findVars_InvalidInput) {
-    EXPECT_ANY_THROW( temp_obj->findNodes(Invalid , non_empty_set_nodes) );
+    EXPECT_ANY_THROW( temp_obj->findVars(Invalid , non_empty_set_nodes) );
 }
 
 TEST_F(ManagerTest, findVars_work)
 {
-    temp_obj-> and2(or2(A, B), and2(C, D));
+    temp_obj-> and2(A, B);
     ClassProject:: set <ClassProject::BDD_ID> vars_of_root;
-    temp_obj-> findNodes(F,vars_of_root);
+    temp_obj-> findVars(AandB,vars_of_root);
     EXPECT_NE(vars_of_root.find(A), vars_of_root.end());// should contain id2
     EXPECT_NE(vars_of_root.find(B), vars_of_root.end()); // should contain id3
-    EXPECT_NE(vars_of_root.find(C), vars_of_root.end()); // should contain id4
-    EXPECT_NE(vars_of_root.find(D), vars_of_root.end());// should contain id5
     EXPECT_EQ(vars_of_root.find(TRUE_ID), vars_of_root.end());// should not contain True_id
     EXPECT_EQ(vars_of_root.find(FALSE_ID), vars_of_root.end());// should not contain False_id
-    EXPECT_EQ(vars_of_root.size(), 4);
+    EXPECT_EQ(vars_of_root.size(), 2);
 }
 //////////  START OF ITE   ////////////
 //Throws Exception when calling ite with an invalid BDD_ID

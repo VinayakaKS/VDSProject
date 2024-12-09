@@ -9,8 +9,6 @@
 #include <iostream>
 #include <table.cpp>
 #include <regex>
-
-
 namespace ClassProject {
     
     class Manager : public ManagerInterface {
@@ -100,6 +98,7 @@ namespace ClassProject {
                 throw std::runtime_error("Row with this id does not exist.");
             }
         }
+
 
     private:
         DynamicTable unique_table;
