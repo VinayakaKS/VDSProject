@@ -71,9 +71,7 @@ namespace ClassProject {
             return -1;
         };
 
-        virtual std::string getTopVarName(const BDD_ID &root) override {
-            return "-1";
-        };
+        virtual std::string getTopVarName(const BDD_ID &root);
 
         virtual void findNodes(const BDD_ID &root, std::set<BDD_ID> &nodes_of_root) override {
         };
@@ -81,9 +79,7 @@ namespace ClassProject {
         virtual void findVars(const BDD_ID &root, std::set<BDD_ID> &vars_of_root) override {
         };
 
-        virtual size_t uniqueTableSize() override {
-            return -1;
-        };
+        virtual size_t uniqueTableSize();
 
         virtual void visualizeBDD(std::string filepath, BDD_ID &root) override {
         };
@@ -93,7 +89,7 @@ namespace ClassProject {
         }
 
         int return_lastID(){
-            return unique_table.last_id-1-1;
+            return unique_table.last_id-1;
         }
 
         TableRow* getData(BDD_ID f) {
