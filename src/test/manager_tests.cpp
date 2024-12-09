@@ -65,6 +65,9 @@ TEST_F(ManagerTest, Createvar_validlabels_id) {
 //created var has a  valid BDD_ID
 TEST_F(ManagerTest, Createvar_invalid_id) {
     EXPECT_EQ( obj->createVar("a"), A );
+    EXPECT_EQ( obj->createVar("b"), B );
+    EXPECT_EQ( obj->createVar("c"), C );
+    EXPECT_EQ( obj->createVar("d"), D );
 };
 //same labels are refered with same BDDID
 TEST_F(ManagerTest, Createvar_SameIDforsameLabel)
@@ -73,8 +76,8 @@ TEST_F(ManagerTest, Createvar_SameIDforsameLabel)
 };
 //BDDID is different for non-identical labels and incremented
 TEST_F(ManagerTest, Createvar_UniQueidforlabel) {
-    const ClassProject::BDD_ID id2 = obj->createVar("b");
-    const ClassProject::BDD_ID id3 = obj->createVar("a+b");
+    const ClassProject::BDD_ID id2 = temp_obj->createVar("b");
+    const ClassProject::BDD_ID id3 = temp_obj->createVar("a+b");
     EXPECT_NE(id2, id3);  // Ensure the IDs are different
     EXPECT_EQ( id3, id2+1); // Ensure the incrementation
 };
@@ -174,6 +177,7 @@ TEST_F(ManagerTest, iteException) {
 
 // Terminal Case 1 Test
 TEST_F(ManagerTest, iteTerminal1) {
+    obj->print_table();
     EXPECT_EQ( obj->ite(TRUE_ID , B , C) , B);
 }
 
@@ -204,6 +208,7 @@ TEST_F(ManagerTest, iteTerminal6) {
 
 // A OR B Case 7 Test
 TEST_F(ManagerTest, iteAorB) {  
+    obj->print_table();
     EXPECT_EQ( obj->ite(A , TRUE_ID , B) , A_OR_B);
 }
 
@@ -225,7 +230,8 @@ TEST_F(ManagerTest, coFactorTrueNotVariable) {
     EXPECT_ANY_THROW( obj->coFactorTrue(A_OR_B , C_AND_D));
 }
 
-TEST_F(ManagerTest, coFactorTrueTopVariable) {  
+TEST_F(ManagerTest, coFactorTrueTopVariable) { 
+    obj->print_table() ;
     EXPECT_EQ( obj->coFactorTrue(C_AND_D , C) , D);
 }
 

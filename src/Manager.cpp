@@ -173,3 +173,7 @@ BDD_ID Manager::xor2(BDD_ID a, BDD_ID b) //ite(a,neg_b,b)
     label_storage = unique_table.getRowById(a)->label + " xor " + unique_table.getRowById(b)->label; 
     return ite(a,neg_b,b);
 };
+
+size_t Manager::uniqueTableSize() {
+    return unique_table.tableSize();
+};
