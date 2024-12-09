@@ -340,10 +340,26 @@ TEST_F(ManagerTest, xor2Works) {
 //////////  END OF xor2   ////////////
 
 
-//         virtual std::string getTopVarName(const BDD_ID &root) override {  // N
-//             return "-1";
-//         };
 
-//         virtual void visualizeBDD(std::string filepath, BDD_ID &root) override {
-//         }; not included
+//////////  START OF getTopVarName   ////////////
+TEST_F(ManagerTest, getTopVarNameInvalidInput) {  
+    EXPECT_ANY_THROW( obj->getTopVarName(Invalid) );
+}
+
+TEST_F(ManagerTest, getTopVarNameofConstant) {  
+    EXPECT_EQ( obj->getTopVarName(FALSE_ID), "FALSE" );
+    EXPECT_EQ( obj->getTopVarName(TRUE_ID), "TRUE" );
+}
+
+TEST_F(ManagerTest, getTopVarNameofVariable) {  
+    EXPECT_EQ( obj->getTopVarName(A), "a" );
+    EXPECT_EQ( obj->getTopVarName(B), "b" );
+}
+
+TEST_F(ManagerTest, getTopVarNameofNode) {  
+    EXPECT_EQ( obj->getTopVarName(A_OR_B), "a+b" );
+    EXPECT_EQ( obj->getTopVarName(C_AND_D), "c*d" );
+}
+//////////  END OF getTopVarName   ////////////
+
 
