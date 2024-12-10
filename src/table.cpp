@@ -93,5 +93,16 @@ class DynamicTable {
         size_t tableSize() {
             return UniqueTable.size();
         }
+
+        // Delete the table
+        void deleteTable()
+        {
+            // Clear all data structures
+            UniqueTable.clear();          // Clears the vector containing table rows
+            idMap.clear();                // Clears the idMap
+            labelMap.clear();             // Clears the labelMap
+            last_id = 0;                  // Reset the last_id counter
+            cout << "Table has been deleted." << endl;
+        }
 };
 
