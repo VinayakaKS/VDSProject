@@ -20,6 +20,13 @@ BDD_ID Manager::createVar(const std::string &label) {
     }
 }
 
+/**
+ * Checks if the passed on Node is a constant which are True node and False node
+ * 
+ * @param   BDD_ID of the node to be checked
+ * @return  true : if a constant
+ *          false : if not a constant 
+ */
 bool Manager::isConstant(BDD_ID f) {
     TableRow* tr = unique_table.getRowById(f);
     if(tr) {
@@ -29,6 +36,13 @@ bool Manager::isConstant(BDD_ID f) {
     }
 }
 
+/**
+ * Checks if the passed on Node is a variable which will be pointing to a constant
+ * 
+ * @param   BDD_ID of the node to be checked
+ * @return  true : if a variable
+ *          false : if not a variable 
+ */
 bool Manager::isVariable(BDD_ID x) {
     TableRow* tr = unique_table.getRowById(x); 
     if(tr) {
@@ -38,6 +52,9 @@ bool Manager::isVariable(BDD_ID x) {
     }
 }
 
+/**
+ * Returns the ID of the top variable of the passed node
+ */
 BDD_ID Manager::topVar(BDD_ID f) {
     TableRow* tr = unique_table.getRowById(f); 
     if(tr) {
@@ -47,7 +64,13 @@ BDD_ID Manager::topVar(BDD_ID f) {
     }
 }
 
-
+/**
+ * Returns the true cofactor of the node with respect to the variable passed
+ * 
+ * @param   f : BDD_ID of the node to be checked
+ *          x : variable with respect to
+ * @return  ID : returns the true - cofactor of the function
+ */
 BDD_ID Manager::coFactorTrue(BDD_ID f, BDD_ID x){
     if(f > return_lastID() || x > return_lastID())
         throw std::runtime_error("Invalid BDD_ID - True cofactor doesnt exist");
@@ -64,6 +87,13 @@ BDD_ID Manager::coFactorTrue(BDD_ID f, BDD_ID x){
     else return f;//vfo ite(x,f,0)
 }
 
+/**
+ * Returns the false cofactor of the node with respect to the variable passed
+ * 
+ * @param   f : BDD_ID of the node to be checked
+ *          x : variable with respect to
+ * @return  ID : returns the false - cofactor of the function
+ */
 BDD_ID Manager::coFactorFalse(BDD_ID f, BDD_ID x){
     if(f > return_lastID() || x > return_lastID())
         throw std::runtime_error("Invalid BDD_ID - False cofactor doesnt exist");
@@ -81,6 +111,9 @@ BDD_ID Manager::coFactorFalse(BDD_ID f, BDD_ID x){
     else return f;//v0f ite(x,0,f)
 }
 
+/**
+ * Returns the true co factor of the node with respect to the node's top variable
+ */
 BDD_ID Manager::coFactorTrue(BDD_ID f){
     if(f > return_lastID())
         throw std::runtime_error("Invalid BDD_ID");
@@ -88,6 +121,9 @@ BDD_ID Manager::coFactorTrue(BDD_ID f){
     return unique_table.getRowById(f)->high;
 }
 
+/**
+ * Returns the false co factor of the node with respect to the node's top variable
+ */
 BDD_ID Manager::coFactorFalse(BDD_ID f){
     if(f > return_lastID())
         throw std::runtime_error("Invalid BDD_ID");
@@ -95,8 +131,14 @@ BDD_ID Manager::coFactorFalse(BDD_ID f){
     return unique_table.getRowById(f)->low;
 }
 
-
-BDD_ID Manager::ite(BDD_ID i, BDD_ID t, BDD_ID e)  //i*t+ibar*e
+/**
+ * Performs an If Then Else(ITE) : [i*t+~i*e] operation on the given nodes
+ * Function implementaion in accordance with the Prof. Kunz lectures
+ * 
+ * @param   i,t,e : BDD_ID of nodes 
+ * @return  returns the ID of the resulting row
+ */
+BDD_ID Manager::ite(BDD_ID i, BDD_ID t, BDD_ID e)  
 {
     BDD_ID topVariable,topVari,topVart,topVare;
     BDD_ID high, low;
@@ -116,18 +158,20 @@ BDD_ID Manager::ite(BDD_ID i, BDD_ID t, BDD_ID e)  //i*t+ibar*e
     if(t==0 && e==1)                         //ite(i,0,1) should return neg(i)
     {
         TableRow *data = unique_table.getRowById(i);
-        string label = "neg("+ data->label+")";
-        new_row_data = {0,label,data->low,data->high,data->topVar};
-        return unique_table.addRow(&new_row_data);
+        /*Check for the redundancy*/
+        check_row_data = unique_table.getRowByData(data->low,data->high,data->topVar);
+        if(check_row_data != nullptr)
+            return check_row_data->id;
+        else  
+        {
+            string label = "neg("+ data->label+")";
+            new_row_data = {0,label,data->low,data->high,data->topVar};
+            return unique_table.addRow(&new_row_data);
+        }
+
     }
 
-    /*
-    if(t==1 || e==1) return 1;               //ite(i,1,e) or ite(i,t,1)
-    if(t==0) return e;                       //ite(i,0,e)
-    if(e==0) return t;                       //ite(i,t,0)
-    */
-
-    /*Top variable*/
+    /*Find top variable*/
     topVari =  ((i!=1)&(i!=0))? topVar(i): LIMIT;
     topVart =  ((t!=1)&(t!=0))? topVar(t): LIMIT;
     topVare =  ((e!=1)&(e!=0))? topVar(e): LIMIT;
@@ -154,16 +198,9 @@ BDD_ID Manager::ite(BDD_ID i, BDD_ID t, BDD_ID e)  //i*t+ibar*e
     }
 }
 
-
-BDD_ID Manager::and2(BDD_ID a, BDD_ID b) //ite(a,b,0)
-{
-    if(a > return_lastID() || b > return_lastID())
-        throw std::runtime_error("Invalid BDD_ID given for and operation");
-
-    label_storage = unique_table.getRowById(a)->label + " and " + unique_table.getRowById(b)->label; 
-    return ite(a,b,0);
-}
-
+/**
+ *  Performs negation on the given node and returns the row ID of result
+ */
 BDD_ID Manager::neg(BDD_ID a) {
     TableRow* tr = unique_table.getRowById(a); 
     if(&tr) {
@@ -173,6 +210,46 @@ BDD_ID Manager::neg(BDD_ID a) {
     }
 };
 
+/**
+ * Performs and operation on the given nodes and returns the row ID of result
+ */
+BDD_ID Manager::and2(BDD_ID a, BDD_ID b) //ite(a,b,0)
+{
+    if(a > return_lastID() || b > return_lastID())
+        throw std::runtime_error("Invalid BDD_ID given for and operation");
+
+    label_storage = unique_table.getRowById(a)->label + " and " + unique_table.getRowById(b)->label; 
+    return ite(a,b,0);
+}
+
+/**
+ * Performs or operation on the given nodes and returns the row ID of result
+ */
+BDD_ID Manager::or2(BDD_ID a, BDD_ID b) //ite(a,1,b)
+{
+    if(a > return_lastID() || b > return_lastID())
+        throw std::runtime_error("Invalid BDD_ID given for or operation");
+
+    label_storage = unique_table.getRowById(a)->label + " or " + unique_table.getRowById(b)->label; 
+    return ite(a,1,b);
+}
+
+/**
+ * Performs xor operation on the given nodes and returns the row ID of result
+ */
+BDD_ID Manager::xor2(BDD_ID a, BDD_ID b) //ite(a,neg_b,b)
+{
+    if(a > return_lastID() || b > return_lastID())
+        throw std::runtime_error("Invalid BDD_ID given for xor operation");
+
+    BDD_ID neg_b = neg(b);
+    label_storage = unique_table.getRowById(a)->label + " xor " + unique_table.getRowById(b)->label; 
+    return ite(a,neg_b,b);
+}
+
+/**
+ * Performs nand operation on the given nodes and returns the row ID of result
+ */
 BDD_ID Manager::nand2(BDD_ID a, BDD_ID b) //ite(a,b,0)
 {
     TableRow* tra = unique_table.getRowById(a); 
@@ -184,6 +261,9 @@ BDD_ID Manager::nand2(BDD_ID a, BDD_ID b) //ite(a,b,0)
     }
 }
 
+/**
+ * Performs nor operation on the given nodes and returns the row ID of result
+ */
 BDD_ID Manager::nor2(BDD_ID a, BDD_ID b) {
     TableRow* tra = unique_table.getRowById(a); 
     TableRow* trb = unique_table.getRowById(b); 
@@ -194,6 +274,9 @@ BDD_ID Manager::nor2(BDD_ID a, BDD_ID b) {
     }
 };
 
+/**
+ * Performs exclusive nor operation on the given nodes and returns the row ID of result
+ */
 BDD_ID Manager::xnor2(BDD_ID a, BDD_ID b) {
     TableRow* tra = unique_table.getRowById(a); 
     TableRow* trb = unique_table.getRowById(b); 
@@ -204,25 +287,9 @@ BDD_ID Manager::xnor2(BDD_ID a, BDD_ID b) {
     }
 };
 
-BDD_ID Manager::or2(BDD_ID a, BDD_ID b) //ite(a,1,b)
-{
-    if(a > return_lastID() || b > return_lastID())
-        throw std::runtime_error("Invalid BDD_ID given for or operation");
-
-    label_storage = unique_table.getRowById(a)->label + " or " + unique_table.getRowById(b)->label; 
-    return ite(a,1,b);
-}
-
-BDD_ID Manager::xor2(BDD_ID a, BDD_ID b) //ite(a,neg_b,b)
-{
-    if(a > return_lastID() || b > return_lastID())
-        throw std::runtime_error("Invalid BDD_ID given for xor operation");
-
-    BDD_ID neg_b = neg(b);
-    label_storage = unique_table.getRowById(a)->label + " xor " + unique_table.getRowById(b)->label; 
-    return ite(a,neg_b,b);
-}
-
+/**
+ * Returns the label of the top variable of the given node
+ */
 string Manager::getTopVarName(const BDD_ID &root)
 {
     TableRow* topVariable = unique_table.getRowById(root);
@@ -232,6 +299,9 @@ string Manager::getTopVarName(const BDD_ID &root)
         return unique_table.getRowById(topVariable->topVar)->label;
 }
 
+/**
+ * Returns the size of the Unique table
+ */
 size_t Manager::uniqueTableSize() {
     return unique_table.tableSize();
 }
