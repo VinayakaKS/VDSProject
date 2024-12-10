@@ -309,6 +309,22 @@ size_t Manager::uniqueTableSize() {
     return unique_table.tableSize();
 }
 
+void Manager::findNodes(const BDD_ID &root, std::set<BDD_ID> &nodes_of_root) {
+    findNodesOrVars(root , nodes_of_root , true);
+};
+
+void Manager::findVars(const BDD_ID &root, std::set<BDD_ID> &vars_of_root) {
+    findNodesOrVars(root , vars_of_root , false);
+};
+
+void Manager::findNodes(const BDD_ID &root, std::set<BDD_ID> &nodes_of_root) {
+    findNodesOrVars(root , nodes_of_root , true);
+};
+
+void Manager::findVars(const BDD_ID &root, std::set<BDD_ID> &vars_of_root) {
+    findNodesOrVars(root , vars_of_root , false);
+};
+
 
 void Manager::visualizeBDD(std::string filepath, BDD_ID &root)
 {

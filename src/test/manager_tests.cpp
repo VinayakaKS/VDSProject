@@ -223,13 +223,15 @@ TEST_F(ManagerTest, findNodes_InvalidInput) {
 
 TEST_F(ManagerTest, findNodes_work)
 {
+    temp_obj->createVar("a");
+    temp_obj->createVar("b");
     temp_obj-> and2(A, B);
     ClassProject:: set <ClassProject::BDD_ID> nodes_of_root;
-    temp_obj-> findNodes(AandB,nodes_of_root);
+    temp_obj->findNodes(AandB,nodes_of_root);
+    EXPECT_NE(nodes_of_root.find(A), nodes_of_root.end());// should contain id2
     EXPECT_NE(nodes_of_root.find(B), nodes_of_root.end());// should contain id3
     EXPECT_NE(nodes_of_root.find(AandB), nodes_of_root.end());// should contain itself
-    EXPECT_EQ(nodes_of_root.size(), 4);
-
+    EXPECT_EQ(nodes_of_root.size(), 3);
 }
 
 //////////  END OF findNodes  ////////////
@@ -241,9 +243,11 @@ TEST_F(ManagerTest, findVars_InvalidInput) {
 
 TEST_F(ManagerTest, findVars_work)
 {
+    temp_obj->createVar("a");
+    temp_obj->createVar("b");
     temp_obj-> and2(A, B);
     ClassProject:: set <ClassProject::BDD_ID> vars_of_root;
-    temp_obj-> findVars(AandB,vars_of_root);
+    temp_obj->findVars(AandB,vars_of_root);
     EXPECT_NE(vars_of_root.find(A), vars_of_root.end());// should contain id2
     EXPECT_NE(vars_of_root.find(B), vars_of_root.end()); // should contain id3
     EXPECT_EQ(vars_of_root.find(TRUE_ID), vars_of_root.end());// should not contain True_id
