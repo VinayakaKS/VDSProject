@@ -3,7 +3,7 @@
 //
 
 #include "Tests.h"
-#include <set>
+
 
 // Test fixture
 class ManagerTest : public ::testing::Test {
@@ -55,7 +55,7 @@ ClassProject::set <ClassProject::BDD_ID> non_empty_set_nodes = {10, 20};
 TEST_F(ManagerTest, TRUE) {
     EXPECT_EQ( obj->True(), TRUE_ID );
 }
-// checks the id for true label
+// checks the id for false label
 TEST_F(ManagerTest, FALSE) {
     EXPECT_EQ( obj->False(), FALSE_ID );
 }
@@ -129,6 +129,7 @@ TEST_F(ManagerTest, topvar_validreturn) {
     EXPECT_EQ( obj->topVar(A),A);
 };
 //end of topvar
+
 
 //////////  START OF neg  ////////////
 
@@ -410,19 +411,6 @@ TEST_F(ManagerTest, xor2Works) {
     EXPECT_EQ( temp_obj->getData(new_id)->topVar , A );
 }
 //////////  END OF xor2   ////////////
-
-TEST_F(ManagerTest, getTopVarName_valid) {
-    EXPECT_ANY_THROW(temp_obj->getTopVarName(Invalid));
-}
-
-TEST_F(ManagerTest, getTopVarName_works){
-    temp_obj-> and2(A,B);
-    EXPECT_EQ(temp_obj->getTopVarName(AandB), A);
-    EXPECT_EQ(temp_obj->getTopVarName(TRUE_ID), TRUE_ID);
-}
-
-
-
 
 
 //////////  START OF getTopVarName   ////////////
