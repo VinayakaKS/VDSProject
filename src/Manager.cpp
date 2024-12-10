@@ -164,6 +164,46 @@ BDD_ID Manager::and2(BDD_ID a, BDD_ID b) //ite(a,b,0)
     return ite(a,b,0);
 }
 
+BDD_ID Manager::neg(BDD_ID a) {
+    TableRow* tr = unique_table.getRowById(a); 
+    if(&tr) {
+        return ite(a , FALSE_ROW , TRUE_ROW);
+    } else {
+        throw std::runtime_error("Row with this id does not exist.");
+    }
+};
+
+BDD_ID Manager::nand2(BDD_ID a, BDD_ID b) //ite(a,b,0)
+{
+    TableRow* tra = unique_table.getRowById(a); 
+    TableRow* trb = unique_table.getRowById(b); 
+    if(&tra && &trb) {
+        return ite(a , neg(b) , TRUE_ROW);
+    } else {
+        throw std::runtime_error("Rows with these ids do not exist.");
+    }
+}
+
+BDD_ID Manager::nor2(BDD_ID a, BDD_ID b) {
+    TableRow* tra = unique_table.getRowById(a); 
+    TableRow* trb = unique_table.getRowById(b); 
+    if(&tra && &trb) {
+        return ite(a , FALSE_ROW , neg(b));
+    } else {
+        throw std::runtime_error("Rows with these ids do not exist.");
+    }
+};
+
+BDD_ID Manager::xnor2(BDD_ID a, BDD_ID b) {
+    TableRow* tra = unique_table.getRowById(a); 
+    TableRow* trb = unique_table.getRowById(b); 
+    if(&tra && &trb) {
+        return ite(a , b , neg(b));
+    } else {
+        throw std::runtime_error("Rows with these ids do not exist.");
+    }
+};
+
 BDD_ID Manager::or2(BDD_ID a, BDD_ID b) //ite(a,1,b)
 {
     if(a > return_lastID() || b > return_lastID())

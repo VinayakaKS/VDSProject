@@ -55,21 +55,13 @@ namespace ClassProject {
 
         virtual BDD_ID xor2(BDD_ID a, BDD_ID b);
 
-        virtual BDD_ID neg(BDD_ID a) override {
-            return -1;
-        };
+        virtual BDD_ID neg(BDD_ID a);
 
-        virtual BDD_ID nand2(BDD_ID a, BDD_ID b) override {
-            return -1;
-        };
+        virtual BDD_ID nand2(BDD_ID a, BDD_ID b) ;
 
-        virtual BDD_ID nor2(BDD_ID a, BDD_ID b) override {
-            return -1;
-        };
+        virtual BDD_ID nor2(BDD_ID a, BDD_ID b);
 
-        virtual BDD_ID xnor2(BDD_ID a, BDD_ID b) override {
-            return -1;
-        };
+        virtual BDD_ID xnor2(BDD_ID a, BDD_ID b);
 
         virtual std::string getTopVarName(const BDD_ID &root);
 
