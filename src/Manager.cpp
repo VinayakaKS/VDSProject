@@ -2,6 +2,9 @@
 
 using namespace std;
 using namespace ClassProject;
+#include <fstream>
+#include <iostream>
+#include <string>
 
 typedef size_t BDD_ID;
 string label_storage;
@@ -304,4 +307,22 @@ string Manager::getTopVarName(const BDD_ID &root)
  */
 size_t Manager::uniqueTableSize() {
     return unique_table.tableSize();
+}
+
+
+void Manager::visualizeBDD(std::string filepath, BDD_ID &root)
+{
+    ofstream file;
+    file.open(filepath);
+    
+    if (!file) {
+        throw std::runtime_error("Invalid filepath");
+        return;
+    }
+
+    file << "digraph BDD {\n";
+    /*Implementation*/
+    file << "}\n";
+
+    file.close();
 }

@@ -71,8 +71,7 @@ namespace ClassProject {
 
         virtual size_t uniqueTableSize();
 
-        virtual void visualizeBDD(std::string filepath, BDD_ID &root) override {
-        };
+        void visualizeBDD(std::string filepath, BDD_ID &root);
 
         void print_table() {
             unique_table.displayTable();
