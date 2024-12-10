@@ -63,11 +63,9 @@ namespace ClassProject {
 
         virtual std::string getTopVarName(const BDD_ID &root);
 
-        virtual void findNodes(const BDD_ID &root, std::set<BDD_ID> &nodes_of_root) override {
-        };
+        virtual void findNodes(const BDD_ID &root, std::set<BDD_ID> &nodes_of_root);
 
-        virtual void findVars(const BDD_ID &root, std::set<BDD_ID> &vars_of_root) override {
-        };
+        virtual void findVars(const BDD_ID &root, std::set<BDD_ID> &vars_of_root);
 
         virtual size_t uniqueTableSize();
 
@@ -88,6 +86,31 @@ namespace ClassProject {
                 return tr;
             } else {
                 throw std::runtime_error("Row with this id does not exist.");
+            }
+        }
+
+
+        void findNodesOrVars(const BDD_ID &root, std::set<BDD_ID> &nodes_of_root , bool node = true) {
+            TableRow* tr = unique_table.getRowById(root); 
+            if(tr) {
+                addToSet(nodes_of_root , tr->id , node);
+                addToSet(nodes_of_root , tr->topVar , node);
+                addToSet(nodes_of_root , tr->high , node);
+                addToSet(nodes_of_root , tr->low , node);
+                if(!isConstant(tr->high)) {
+                    findNodesOrVars(tr->high , nodes_of_root , node);
+                }
+                if(!isConstant(tr->low)) {
+                    findNodesOrVars(tr->low , nodes_of_root , node);
+                }
+            } else {
+                throw std::runtime_error("Row with this id does not exist.");
+            }
+        }    
+
+        void addToSet(std::set<BDD_ID> &nodes_of_root , BDD_ID id , bool node = true ) {
+            if((node || (!node && isVariable(id))) && !isConstant(id)) {
+                nodes_of_root.insert(id);
             }
         }
 
