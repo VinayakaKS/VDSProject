@@ -15,8 +15,8 @@ namespace ClassProject {
     
     public:
         Manager() {
-            TableRow true_node = {1,"TRUE",1,1,1};
-            TableRow false_node = {0,"FALSE",0,0,0};
+            TableRow true_node = {1,"True",1,1,1};
+            TableRow false_node = {0,"False",0,0,0};
             unique_table.addRow(&false_node);
             unique_table.addRow(&true_node);
         }
@@ -93,7 +93,7 @@ namespace ClassProject {
             TableRow* tr = unique_table.getRowById(root); 
             if(tr) {
                 addToSet(nodes_of_root , tr->id , node);
-                addToSet(nodes_of_root , tr->topVar , node);
+                // addToSet(nodes_of_root , tr->topVar , node);
                 addToSet(nodes_of_root , tr->high , node);
                 addToSet(nodes_of_root , tr->low , node);
                 if(!isConstant(tr->high)) {
@@ -108,7 +108,7 @@ namespace ClassProject {
         }    
 
         void addToSet(std::set<BDD_ID> &nodes_of_root , BDD_ID id , bool node = true ) {
-            if((node || (!node && isVariable(id))) && !isConstant(id)) {
+            if(node || (!node && isVariable(id))) {
                 nodes_of_root.insert(id);
             }
         }

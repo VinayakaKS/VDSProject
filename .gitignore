@@ -5,3 +5,4 @@ cmake-build-debug/
 .idea/
 src/ManagerNotes.h
 src/Manager_local.cpp
+TestsPart1.h

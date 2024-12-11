@@ -161,17 +161,18 @@ BDD_ID Manager::ite(BDD_ID i, BDD_ID t, BDD_ID e)
     if(t==0 && e==1)                         //ite(i,0,1) should return neg(i)
     {
         TableRow *data = unique_table.getRowById(i);
-        /*Check for the redundancy*/
-        check_row_data = unique_table.getRowByData(data->low,data->high,data->topVar);
-        if(check_row_data != nullptr)
-            return check_row_data->id;
-        else  
-        {
-            string label = "neg("+ data->label+")";
-            new_row_data = {0,label,data->low,data->high,data->topVar};
-            return unique_table.addRow(&new_row_data);
+        if(isVariable(i)) {
+            /*Check for the redundancy*/
+            check_row_data = unique_table.getRowByData(data->low,data->high,data->topVar);
+            if(check_row_data != nullptr)
+                return check_row_data->id;
+            else  
+            {
+                string label = "neg("+ data->label+")";
+                new_row_data = {0,label,data->low,data->high,data->topVar};
+                return unique_table.addRow(&new_row_data);
+            }
         }
-
     }
 
     /*Find top variable*/
@@ -206,7 +207,7 @@ BDD_ID Manager::ite(BDD_ID i, BDD_ID t, BDD_ID e)
  */
 BDD_ID Manager::neg(BDD_ID a) {
     TableRow* tr = unique_table.getRowById(a); 
-    if(&tr) {
+    if(tr) {
         return ite(a , FALSE_ROW , TRUE_ROW);
     } else {
         throw std::runtime_error("Row with this id does not exist.");
