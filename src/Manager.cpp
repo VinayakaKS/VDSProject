@@ -77,17 +77,26 @@ BDD_ID Manager::topVar(BDD_ID f) {
 BDD_ID Manager::coFactorTrue(BDD_ID f, BDD_ID x){
     if(f > return_lastID() || x > return_lastID())
         throw std::runtime_error("Invalid BDD_ID - True cofactor doesnt exist");
-    if(!isVariable(x))
-        throw runtime_error("Not a variable - True cofactor doesnt exist");
+
+    if(!isVariable(x) && !isConstant(x))
+        throw std::runtime_error("Not a variable or constant - True cofactor doesnt exist");
         
     TableRow* row;
     if(topVar(f) == x)
     {
         row = unique_table.getRowById(f);
         return row->high;
+    } else if (f == FALSE_ROW || f == TRUE_ROW) {
+        return f;
     }
         
-    else return f;//vfo ite(x,f,0)
+    // x is not the top variable: recursively compute cofactor for subfunctions
+    BDD_ID lowBranch = coFactorTrue(unique_table.getRowById(f)->low, x);
+    BDD_ID highBranch = coFactorTrue(unique_table.getRowById(f)->high, x);
+    
+    // Reconstruct the ITE for the function without x
+    return ite(topVar(f), highBranch, lowBranch);
+    // else return f;//vfo ite(x,f,0)
 }
 
 /**
@@ -101,17 +110,25 @@ BDD_ID Manager::coFactorFalse(BDD_ID f, BDD_ID x){
     if(f > return_lastID() || x > return_lastID())
         throw std::runtime_error("Invalid BDD_ID - False cofactor doesnt exist");
 
-    if(!isVariable(x))
-        throw runtime_error("Not a variable - True cofactor doesnt exist");
-
+    if(!isVariable(x) && !isConstant(x))
+        throw std::runtime_error("Not a variable or constant - True cofactor doesnt exist");
+        
     TableRow* row;
     if(topVar(f) == x)
     {
         row = unique_table.getRowById(f);
         return row->low;
+    } else if (f == FALSE_ROW || f == TRUE_ROW) {
+        return f;
     }
-        
-    else return f;//v0f ite(x,0,f)
+
+    // x is not the top variable: recursively compute cofactor for subfunctions
+    BDD_ID lowBranch = coFactorFalse(unique_table.getRowById(f)->low, x);
+    BDD_ID highBranch = coFactorFalse(unique_table.getRowById(f)->high, x);
+    
+    // Reconstruct the ITE for the function without x
+    return ite(topVar(f), highBranch, lowBranch);
+    // else return f;//v0f ite(x,0,f)
 }
 
 /**
