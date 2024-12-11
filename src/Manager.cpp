@@ -9,6 +9,9 @@ using namespace ClassProject;
 typedef size_t BDD_ID;
 string label_storage;
 
+/**
+ * Creates a node for the variable given.
+ */
 BDD_ID Manager::createVar(const std::string &label) {
     std::regex pattern("^!?[A-Za-z]([+*^!][A-Za-z])*$");
     if(!std::regex_match(label, pattern)) {
@@ -31,7 +34,7 @@ BDD_ID Manager::createVar(const std::string &label) {
  *          false : if not a constant 
  */
 bool Manager::isConstant(BDD_ID f) {
-    TableRow* tr = unique_table.getRowById(f);
+    TableRow* tr = getData(f);
     if(tr) {
         return (f == FALSE_ROW || f == TRUE_ROW) ;
     } else {
@@ -47,7 +50,7 @@ bool Manager::isConstant(BDD_ID f) {
  *          false : if not a variable 
  */
 bool Manager::isVariable(BDD_ID x) {
-    TableRow* tr = unique_table.getRowById(x); 
+    TableRow* tr = getData(x); 
     if(tr) {
         return (x != FALSE_ROW && x != TRUE_ROW && tr->high == TRUE_ROW && tr->low == FALSE_ROW && tr->topVar == x) ;
     } else {
@@ -59,7 +62,7 @@ bool Manager::isVariable(BDD_ID x) {
  * Returns the ID of the top variable of the passed node
  */
 BDD_ID Manager::topVar(BDD_ID f) {
-    TableRow* tr = unique_table.getRowById(f); 
+    TableRow* tr = getData(f); 
     if(tr) {
         return tr->topVar;
     } else {
@@ -84,19 +87,18 @@ BDD_ID Manager::coFactorTrue(BDD_ID f, BDD_ID x){
     TableRow* row;
     if(topVar(f) == x)
     {
-        row = unique_table.getRowById(f);
+        row = getData(f);
         return row->high;
     } else if (f == FALSE_ROW || f == TRUE_ROW) {
         return f;
     }
         
     // x is not the top variable: recursively compute cofactor for subfunctions
-    BDD_ID lowBranch = coFactorTrue(unique_table.getRowById(f)->low, x);
-    BDD_ID highBranch = coFactorTrue(unique_table.getRowById(f)->high, x);
+    BDD_ID lowBranch = coFactorTrue(getData(f)->low, x);
+    BDD_ID highBranch = coFactorTrue(getData(f)->high, x);
     
     // Reconstruct the ITE for the function without x
     return ite(topVar(f), highBranch, lowBranch);
-    // else return f;//vfo ite(x,f,0)
 }
 
 /**
@@ -116,19 +118,18 @@ BDD_ID Manager::coFactorFalse(BDD_ID f, BDD_ID x){
     TableRow* row;
     if(topVar(f) == x)
     {
-        row = unique_table.getRowById(f);
+        row = getData(f);
         return row->low;
     } else if (f == FALSE_ROW || f == TRUE_ROW) {
         return f;
     }
 
     // x is not the top variable: recursively compute cofactor for subfunctions
-    BDD_ID lowBranch = coFactorFalse(unique_table.getRowById(f)->low, x);
-    BDD_ID highBranch = coFactorFalse(unique_table.getRowById(f)->high, x);
+    BDD_ID lowBranch = coFactorFalse(getData(f)->low, x);
+    BDD_ID highBranch = coFactorFalse(getData(f)->high, x);
     
     // Reconstruct the ITE for the function without x
     return ite(topVar(f), highBranch, lowBranch);
-    // else return f;//v0f ite(x,0,f)
 }
 
 /**
@@ -138,7 +139,7 @@ BDD_ID Manager::coFactorTrue(BDD_ID f){
     if(f > return_lastID())
         throw std::runtime_error("Invalid BDD_ID");
         
-    return unique_table.getRowById(f)->high;
+    return getData(f)->high;
 }
 
 /**
@@ -148,7 +149,7 @@ BDD_ID Manager::coFactorFalse(BDD_ID f){
     if(f > return_lastID())
         throw std::runtime_error("Invalid BDD_ID");
 
-    return unique_table.getRowById(f)->low;
+    return getData(f)->low;
 }
 
 /**
@@ -177,7 +178,7 @@ BDD_ID Manager::ite(BDD_ID i, BDD_ID t, BDD_ID e)
     if(t==1 && e==0) return i;               //ite(i,1,0)
     if(t==0 && e==1)                         //ite(i,0,1) should return neg(i)
     {
-        TableRow *data = unique_table.getRowById(i);
+        TableRow *data = getData(i);
         if(isVariable(i)) {
             /*Check for the redundancy*/
             check_row_data = unique_table.getRowByData(data->low,data->high,data->topVar);
@@ -223,7 +224,7 @@ BDD_ID Manager::ite(BDD_ID i, BDD_ID t, BDD_ID e)
  *  Performs negation on the given node and returns the row ID of result
  */
 BDD_ID Manager::neg(BDD_ID a) {
-    TableRow* tr = unique_table.getRowById(a); 
+    TableRow* tr = getData(a); 
     if(tr) {
         return ite(a , FALSE_ROW , TRUE_ROW);
     } else {
@@ -239,7 +240,7 @@ BDD_ID Manager::and2(BDD_ID a, BDD_ID b) //ite(a,b,0)
     if(a > return_lastID() || b > return_lastID())
         throw std::runtime_error("Invalid BDD_ID given for and operation");
 
-    label_storage = unique_table.getRowById(a)->label + " and " + unique_table.getRowById(b)->label; 
+    label_storage = getData(a)->label + " and " + getData(b)->label; 
     return ite(a,b,0);
 }
 
@@ -251,7 +252,7 @@ BDD_ID Manager::or2(BDD_ID a, BDD_ID b) //ite(a,1,b)
     if(a > return_lastID() || b > return_lastID())
         throw std::runtime_error("Invalid BDD_ID given for or operation");
 
-    label_storage = unique_table.getRowById(a)->label + " or " + unique_table.getRowById(b)->label; 
+    label_storage = getData(a)->label + " or " + getData(b)->label; 
     return ite(a,1,b);
 }
 
@@ -264,7 +265,7 @@ BDD_ID Manager::xor2(BDD_ID a, BDD_ID b) //ite(a,neg_b,b)
         throw std::runtime_error("Invalid BDD_ID given for xor operation");
 
     BDD_ID neg_b = neg(b);
-    label_storage = unique_table.getRowById(a)->label + " xor " + unique_table.getRowById(b)->label; 
+    label_storage = getData(a)->label + " xor " + getData(b)->label; 
     return ite(a,neg_b,b);
 }
 
@@ -273,8 +274,8 @@ BDD_ID Manager::xor2(BDD_ID a, BDD_ID b) //ite(a,neg_b,b)
  */
 BDD_ID Manager::nand2(BDD_ID a, BDD_ID b) //ite(a,b,0)
 {
-    TableRow* tra = unique_table.getRowById(a); 
-    TableRow* trb = unique_table.getRowById(b); 
+    TableRow* tra = getData(a); 
+    TableRow* trb = getData(b); 
     if(&tra && &trb) {
         return ite(a , neg(b) , TRUE_ROW);
     } else {
@@ -286,8 +287,8 @@ BDD_ID Manager::nand2(BDD_ID a, BDD_ID b) //ite(a,b,0)
  * Performs nor operation on the given nodes and returns the row ID of result
  */
 BDD_ID Manager::nor2(BDD_ID a, BDD_ID b) {
-    TableRow* tra = unique_table.getRowById(a); 
-    TableRow* trb = unique_table.getRowById(b); 
+    TableRow* tra = getData(a); 
+    TableRow* trb = getData(b); 
     if(&tra && &trb) {
         return ite(a , FALSE_ROW , neg(b));
     } else {
@@ -299,8 +300,8 @@ BDD_ID Manager::nor2(BDD_ID a, BDD_ID b) {
  * Performs exclusive nor operation on the given nodes and returns the row ID of result
  */
 BDD_ID Manager::xnor2(BDD_ID a, BDD_ID b) {
-    TableRow* tra = unique_table.getRowById(a); 
-    TableRow* trb = unique_table.getRowById(b); 
+    TableRow* tra = getData(a); 
+    TableRow* trb = getData(b); 
     if(&tra && &trb) {
         return ite(a , b , neg(b));
     } else {
@@ -313,11 +314,11 @@ BDD_ID Manager::xnor2(BDD_ID a, BDD_ID b) {
  */
 string Manager::getTopVarName(const BDD_ID &root)
 {
-    TableRow* topVariable = unique_table.getRowById(root);
+    TableRow* topVariable = getData(root);
     if(topVariable == nullptr)
         throw std::runtime_error("Invalid BDD_ID given");
     else
-        return unique_table.getRowById(topVariable->topVar)->label;
+        return getData(topVariable->topVar)->label;
 }
 
 /**
@@ -335,8 +336,63 @@ void Manager::findVars(const BDD_ID &root, std::set<BDD_ID> &vars_of_root) {
     findNodesOrVars(root , vars_of_root , false);
 };
 
+void Manager::findNodesOrVars(const BDD_ID &root, std::set<BDD_ID> &nodes_of_root , bool node = true) {
+    TableRow* tr = getData(root); 
+    if(tr) {
+        addToSet(nodes_of_root , tr->id , node);
+        // addToSet(nodes_of_root , tr->topVar , node);
+        addToSet(nodes_of_root , tr->high , node);
+        addToSet(nodes_of_root , tr->low , node);
+        if(!isConstant(tr->high)) {
+            findNodesOrVars(tr->high , nodes_of_root , node);
+        }
+        if(!isConstant(tr->low)) {
+            findNodesOrVars(tr->low , nodes_of_root , node);
+        }
+    } else {
+        throw std::runtime_error("Row with this id does not exist.");
+    }
+}    
+
+void Manager::addToSet(std::set<BDD_ID> &nodes_of_root , BDD_ID id , bool node = true ) {
+    if(node || (!node && isVariable(id))) {
+        nodes_of_root.insert(id);
+    }
+}
+
+/**
+ * Prints Unique table
+ */
+void Manager::print_table() {
+    unique_table.displayTable();
+}
+
+/**
+ * Returns the last assigned BDD
+ */
+int Manager::return_lastID(){
+    return unique_table.last_id-1;
+}
+
+/**
+ * Gets the data from the Row
+ */
+TableRow* Manager::getData(BDD_ID f) {
+    TableRow* tr = unique_table.getRowById(f); 
+    if(tr) {
+        return tr;
+    } else {
+        throw std::runtime_error("Row with this id does not exist.");
+    }
+}
+
+/**
+ * Creates the dot file and copies the data into it
+ */
 void Manager::visualizeBDD(std::string filepath, BDD_ID &root)
 {
+    string graph_styling,node_styling, constant_styling, style;
+    /*File operation*/
     ofstream file;
     file.open(filepath);
     
@@ -345,9 +401,79 @@ void Manager::visualizeBDD(std::string filepath, BDD_ID &root)
         return;
     }
 
-    file << "digraph BDD {\n";
-    /*Implementation*/
-    file << "}\n";
+    graph_styling = "\tgraph [ranksep=0.5, nodesep=0.5];\n";
+    node_styling = "\tnode [style=filled, fillcolor=lightblue, color=darkblue, shape=circle, fixedsize=true, height=0.55];\n";
+    constant_styling = "\tFalse,True\t[shape=square, fillcolor=white, color=black];\n";
+    style = graph_styling + node_styling + constant_styling;
+    
+    file << "graph BDD {\n";
+    file << style;
+    file << cleanString(graphString(root));   //Data
+    file << "}";
 
     file.close();
+    
+    /*
+    int returnCode = system("chmod +x BDD.sh");
+    returnCode = system("../src/graph/BDD.sh");
+
+    // Check the return code
+    if (returnCode == 0) {
+        std::cout << "Graph created successfully!" << std::endl;
+    } else {
+        std::cout << "Error: Script execution failed with code " << returnCode << std::endl;
+    }
+    */
 }
+
+/**
+ * Pushes all the connections into the string recursively
+ */
+string Manager::graphString(BDD_ID id)
+{
+    string return_string = "";
+    TableRow* tr = getData(id);
+
+    if(tr)
+    {
+        if(!isConstant(tr->id))
+        {
+            return_string += getTopVarName(tr->id) + "--" + getTopVarName(tr->low) + "\t[style = dotted];\n";
+            return_string += getTopVarName(tr->id) + "--" + getTopVarName(tr->high)+ ";\n";
+
+            return_string += graphString(tr->low);
+            return_string += graphString(tr->high);
+
+            return return_string;
+
+        }
+        else    
+            return return_string;
+    }
+
+    else    
+        throw std::runtime_error("Rows with these ids do not exist.");
+
+}
+
+/**
+ * Cleans the string for any duplicate connections
+ */
+string Manager::cleanString(string graph_string)
+{
+    stringstream ss(graph_string);       //Stream to process the input string
+    string line;
+    string out = "";
+
+    // Read each line from the input string
+    while (std::getline(ss, line)) {
+        if (out.find(line) == std::string::npos)
+            out += "\t" + line + "\n";
+    }
+
+    return out;
+}
+
+
+
+

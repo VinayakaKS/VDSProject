@@ -70,49 +70,20 @@ namespace ClassProject {
         virtual size_t uniqueTableSize();
 
         void visualizeBDD(std::string filepath, BDD_ID &root);
+        
+        string graphString(BDD_ID id);
+        
+        string cleanString(string graph_string);
 
-        void print_table() {
-            unique_table.displayTable();
-        }
+        void print_table();
+        
+        int return_lastID();
 
-        int return_lastID(){
-            return unique_table.last_id-1;
-        }
+        TableRow* getData(BDD_ID f);
 
-        TableRow* getData(BDD_ID f) {
-            TableRow* tr = unique_table.getRowById(f); 
-            if(tr) {
-                return tr;
-            } else {
-                throw std::runtime_error("Row with this id does not exist.");
-            }
-        }
+        void findNodesOrVars(const BDD_ID &root, set<BDD_ID> &nodes_of_root , bool node);
 
-
-        void findNodesOrVars(const BDD_ID &root, std::set<BDD_ID> &nodes_of_root , bool node = true) {
-            TableRow* tr = unique_table.getRowById(root); 
-            if(tr) {
-                addToSet(nodes_of_root , tr->id , node);
-                // addToSet(nodes_of_root , tr->topVar , node);
-                addToSet(nodes_of_root , tr->high , node);
-                addToSet(nodes_of_root , tr->low , node);
-                if(!isConstant(tr->high)) {
-                    findNodesOrVars(tr->high , nodes_of_root , node);
-                }
-                if(!isConstant(tr->low)) {
-                    findNodesOrVars(tr->low , nodes_of_root , node);
-                }
-            } else {
-                throw std::runtime_error("Row with this id does not exist.");
-            }
-        }    
-
-        void addToSet(std::set<BDD_ID> &nodes_of_root , BDD_ID id , bool node = true ) {
-            if(node || (!node && isVariable(id))) {
-                nodes_of_root.insert(id);
-            }
-        }
-
+        void addToSet(set<BDD_ID> &nodes_of_root , BDD_ID id , bool node);
 
     private:
         DynamicTable unique_table;

@@ -18,7 +18,9 @@ int main(int argc, char* argv[])
     manager.or2(2,3);
     manager.and2(4,5);
     manager.and2(6,7);
-    BDD_ID id = 0; 
+
     manager.print_table();
+
+    BDD_ID id = manager.return_lastID(); 
     manager.visualizeBDD("../src/graph/BDD.dot",id);
 }

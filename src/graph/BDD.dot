@@ -1,2 +1,13 @@
-digraph BDD {
+graph BDD {
+	graph [ranksep=0.5, nodesep=0.5];
+	node [style=filled, fillcolor=lightblue, color=darkblue, shape=circle, fixedsize=true, height=0.55];
+	False,True	[shape=square, fillcolor=white, color=black];
+	a--b	[style = dotted];
+	a--c;
+	b--False	[style = dotted];
+	b--c;
+	c--False	[style = dotted];
+	c--d;
+	d--False	[style = dotted];
+	d--True;
 }
