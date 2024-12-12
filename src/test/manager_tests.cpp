@@ -470,6 +470,22 @@ TEST_F(ManagerTest, NegTest) /* NOLINT */
     temp_obj->print_table();
 }
 
+TEST_F(ManagerTest, FindVarsTest) /* NOLINT */
+{
+    std::set<ClassProject::BDD_ID> a_and_b_nodes;
+
+    ClassProject::BDD_ID a_id = temp_obj->createVar("a");
+    ClassProject::BDD_ID b_id = temp_obj->createVar("b");
+    ClassProject::BDD_ID a_and_b_id = temp_obj-> and2(a_id, b_id);
+
+    temp_obj->findVars(a_and_b_id, a_and_b_nodes);
+
+
+    EXPECT_EQ(a_and_b_nodes.size(), 2);
+    EXPECT_TRUE(a_and_b_nodes.find(a_id) != a_and_b_nodes.end());
+    EXPECT_TRUE(a_and_b_nodes.find(b_id) != a_and_b_nodes.end());
+
+}
 
 TEST_F(ManagerTest, GetTopVarNameTest) /* NOLINT */
 {
