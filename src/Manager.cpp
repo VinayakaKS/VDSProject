@@ -340,7 +340,11 @@ void Manager::findNodesOrVars(const BDD_ID &root, std::set<BDD_ID> &nodes_of_roo
     TableRow* tr = getData(root); 
     if(tr) {
         addToSet(nodes_of_root , tr->id , node);
-        // addToSet(nodes_of_root , tr->topVar , node);
+        if(!node && isVariable(tr->topVar))
+        {
+            addToSet(nodes_of_root , tr->topVar , node);
+        }
+        
         addToSet(nodes_of_root , tr->high , node);
         addToSet(nodes_of_root , tr->low , node);
         if(!isConstant(tr->high)) {

@@ -249,11 +249,11 @@ TEST_F(ManagerTest, findVars_work)
     temp_obj-> and2(A, B);
     ClassProject:: set <ClassProject::BDD_ID> vars_of_root;
     temp_obj->findVars(AandB,vars_of_root);
-    EXPECT_EQ(vars_of_root.find(A), vars_of_root.end());// should not contain id2
+    EXPECT_NE(vars_of_root.find(A), vars_of_root.end());// should not contain id2
     EXPECT_NE(vars_of_root.find(B), vars_of_root.end()); // should contain id3
     EXPECT_EQ(vars_of_root.find(TRUE_ID), vars_of_root.end());// should not contain True_id
     EXPECT_EQ(vars_of_root.find(FALSE_ID), vars_of_root.end());// should not contain False_id
-    EXPECT_EQ(vars_of_root.size(), 1);
+    EXPECT_EQ(vars_of_root.size(), 2);
 }
 //////////  START OF ITE   ////////////
 //Throws Exception when calling ite with an invalid BDD_ID
@@ -480,7 +480,7 @@ TEST_F(ManagerTest, FindVarsTest) /* NOLINT */
 
     temp_obj->findVars(a_and_b_id, a_and_b_nodes);
 
-
+    temp_obj->print_table();
     EXPECT_EQ(a_and_b_nodes.size(), 2);
     EXPECT_TRUE(a_and_b_nodes.find(a_id) != a_and_b_nodes.end());
     EXPECT_TRUE(a_and_b_nodes.find(b_id) != a_and_b_nodes.end());
