@@ -328,14 +328,23 @@ size_t Manager::uniqueTableSize() {
     return unique_table.tableSize();
 }
 
+/**
+ * It fills the set nodes_of_root with all nodes which are reachable from root.
+ */
 void Manager::findNodes(const BDD_ID &root, std::set<BDD_ID> &nodes_of_root) {
     findNodesOrVars(root , nodes_of_root , true);
 };
 
+/**
+ * It fills the set nodes_of_root with all variables which are reachable from root.
+ */
 void Manager::findVars(const BDD_ID &root, std::set<BDD_ID> &vars_of_root) {
     findNodesOrVars(root , vars_of_root , false);
 };
 
+/**
+ * It fills the set nodes_of_root with all variables or nodes which are reachable from root based on the node/variable condition.
+ */
 void Manager::findNodesOrVars(const BDD_ID &root, std::set<BDD_ID> &nodes_of_root , bool node = true) {
     TableRow* tr = getData(root); 
     if(tr) {
