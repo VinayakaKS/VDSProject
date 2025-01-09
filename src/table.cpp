@@ -30,7 +30,7 @@ class DynamicTable {
 
     public:
         size_t last_id = 0;
-        // Add a row to the table 
+        // Add a row to the table
         size_t addRow(TableRow *row_data) {
             if(row_data->topVar == LIMIT) {
                 row_data->topVar = last_id;
@@ -51,7 +51,24 @@ class DynamicTable {
             labelMap[row_data->label] = UniqueTable.size() - 1;
             return (last_id - 1);
         }
+    size_t addRow_Computed(TableRow *row_data) {
+            if(row_data->topVar == LIMIT) {
+                row_data->topVar = last_id;
+            }
 
+            if(row_data->high == LIMIT) {
+                row_data->high = HIGH;
+            }
+
+            if(row_data->low == LIMIT) {
+                row_data->low = LOW;
+            }
+            UniqueTable.push_back(*row_data);
+            cout<< "Row added - "<< row_data->id << " "<<row_data->label <<endl;
+            idMap[row_data->id] = UniqueTable.size() - 1;
+            labelMap[row_data->label] = UniqueTable.size() - 1;
+            return row_data->id;
+        }
         // Get a row by id
         TableRow* getRowById(size_t id) {
             if (idMap.find(id) != idMap.end()) {
@@ -76,7 +93,7 @@ class DynamicTable {
                     return &UniqueTable[row.id];
                 }
             }
-            
+
             return nullptr;
         }
 
