@@ -13,7 +13,7 @@ string label_storage;
  * Creates a node for the variable given.
  */
 BDD_ID Manager::createVar(const std::string &label) {
-    std::regex pattern("^!?[A-Za-z]([+*^!][A-Za-z])*$");
+    std::regex pattern("^!?[A-Za-z0-9]([+*^!][A-Za-z0-9])*$");
     if(!std::regex_match(label, pattern)) {
         throw std::runtime_error("Variable label is not valid. A valid label should contain one or more single alphabets seperated by logical operators (+ * ^ !) or starting with !");
     }
@@ -79,11 +79,15 @@ BDD_ID Manager::topVar(BDD_ID f) {
  */
 BDD_ID Manager::coFactorTrue(BDD_ID f, BDD_ID x){
     if(f > return_lastID() || x > return_lastID())
+    {
         throw std::runtime_error("Invalid BDD_ID - True cofactor doesnt exist");
-
-    if(!isVariable(x) && !isConstant(x))
-        throw std::runtime_error("Not a variable or constant - True cofactor doesnt exist");
+    }
         
+    if(!isVariable(x) && !isConstant(x))
+    {
+        throw std::runtime_error("Not a variable or constant - True cofactor doesnt exist");
+    }
+         
     TableRow* row;
     if(topVar(f) == x)
     {
@@ -110,10 +114,14 @@ BDD_ID Manager::coFactorTrue(BDD_ID f, BDD_ID x){
  */
 BDD_ID Manager::coFactorFalse(BDD_ID f, BDD_ID x){
     if(f > return_lastID() || x > return_lastID())
+    {
         throw std::runtime_error("Invalid BDD_ID - False cofactor doesnt exist");
-
+    }
+        
     if(!isVariable(x) && !isConstant(x))
+    {
         throw std::runtime_error("Not a variable or constant - True cofactor doesnt exist");
+    }
         
     TableRow* row;
     if(topVar(f) == x)
@@ -137,8 +145,9 @@ BDD_ID Manager::coFactorFalse(BDD_ID f, BDD_ID x){
  */
 BDD_ID Manager::coFactorTrue(BDD_ID f){
     if(f > return_lastID())
+    {
         throw std::runtime_error("Invalid BDD_ID");
-        
+    }
     return getData(f)->high;
 }
 
@@ -147,8 +156,9 @@ BDD_ID Manager::coFactorTrue(BDD_ID f){
  */
 BDD_ID Manager::coFactorFalse(BDD_ID f){
     if(f > return_lastID())
+    {
         throw std::runtime_error("Invalid BDD_ID");
-
+    }
     return getData(f)->low;
 }
 
@@ -170,8 +180,10 @@ BDD_ID Manager::ite(BDD_ID i, BDD_ID t, BDD_ID e)
 
     /*Invalid BDD_ID exception*/
     if(i > return_lastID() || t > return_lastID() || e > return_lastID())
+    {
         throw std::runtime_error("Invalid BDD_ID given for ite operation");
-
+    }
+        
     /*Terminal cases*/
     if(i==1) return t;                       //ite(1,t,e)
     if(i==0) return e;                       //ite(0,t,e)
@@ -183,8 +195,9 @@ BDD_ID Manager::ite(BDD_ID i, BDD_ID t, BDD_ID e)
         if(isVariable(i)) {
             /*Check for the redundancy*/
             check_row_data = unique_table.getRowByData(data->low,data->high,data->topVar);
-            if(check_row_data != nullptr)
+            if(check_row_data != nullptr){
                 return check_row_data->id;
+            }
             else  
             {
                 string label = "neg("+ data->label+")";
@@ -211,12 +224,15 @@ BDD_ID Manager::ite(BDD_ID i, BDD_ID t, BDD_ID e)
     low = ite(coFactorFalse(i,topVariable),coFactorFalse(t,topVariable),coFactorFalse(e,topVariable));
 
     /*Reduction rule*/
-    if(high == low) return high;
-
+    if(high == low) {
+        return high;
+    }
     /*Check for the redundancy*/
     check_row_data = unique_table.getRowByData(high,low,topVariable);
     if(check_row_data != nullptr)
+    {
         return check_row_data->id;
+    }
     else
     {
         new_row_data = {0,*temp_label,high,low,topVariable};
@@ -248,8 +264,10 @@ BDD_ID Manager::neg(BDD_ID a) {
 BDD_ID Manager::and2(BDD_ID a, BDD_ID b) //ite(a,b,0)
 {
     if(a > return_lastID() || b > return_lastID())
+    {
         throw std::runtime_error("Invalid BDD_ID given for and operation");
-
+    }
+        
     label_storage = getData(a)->label + " and " + getData(b)->label; 
     return ite(a,b,0);
 }
@@ -260,8 +278,10 @@ BDD_ID Manager::and2(BDD_ID a, BDD_ID b) //ite(a,b,0)
 BDD_ID Manager::or2(BDD_ID a, BDD_ID b) //ite(a,1,b)
 {
     if(a > return_lastID() || b > return_lastID())
+    {
         throw std::runtime_error("Invalid BDD_ID given for or operation");
-
+    }
+        
     label_storage = getData(a)->label + " or " + getData(b)->label; 
     return ite(a,1,b);
 }
@@ -272,8 +292,10 @@ BDD_ID Manager::or2(BDD_ID a, BDD_ID b) //ite(a,1,b)
 BDD_ID Manager::xor2(BDD_ID a, BDD_ID b) //ite(a,neg_b,b)
 {
     if(a > return_lastID() || b > return_lastID())
+    {
         throw std::runtime_error("Invalid BDD_ID given for xor operation");
-
+    }
+        
     BDD_ID neg_b = neg(b);
     label_storage = getData(a)->label + " xor " + getData(b)->label; 
     return ite(a,neg_b,b);
@@ -326,9 +348,13 @@ string Manager::getTopVarName(const BDD_ID &root)
 {
     TableRow* topVariable = getData(root);
     if(topVariable == nullptr)
+    {
         throw std::runtime_error("Invalid BDD_ID given");
+    }
     else
+    {
         return getData(topVariable->topVar)->label;
+    }     
 }
 
 /**
@@ -357,7 +383,8 @@ void Manager::findVars(const BDD_ID &root, std::set<BDD_ID> &vars_of_root) {
  */
 void Manager::findNodesOrVars(const BDD_ID &root, std::set<BDD_ID> &nodes_of_root , bool node = true) {
     TableRow* tr = getData(root); 
-    if(tr) {
+    if(tr) 
+    {
         addToSet(nodes_of_root , tr->id , node);
         if(!node && isVariable(tr->topVar))
         {
@@ -473,12 +500,15 @@ string Manager::graphString(BDD_ID id)
 
         }
         else    
+        {
             return return_string;
+        }   
     }
 
-    else    
+    else
+    {
         throw std::runtime_error("Rows with these ids do not exist.");
-
+    }          
 }
 
 /**
@@ -493,7 +523,9 @@ string Manager::cleanString(string graph_string)
     // Read each line from the input string
     while (std::getline(ss, line)) {
         if (out.find(line) == std::string::npos)
+        {
             out += "\t" + line + "\n";
+        } 
     }
 
     return out;
