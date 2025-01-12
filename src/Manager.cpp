@@ -163,6 +163,7 @@ BDD_ID Manager::ite(BDD_ID i, BDD_ID t, BDD_ID e)
 {
     BDD_ID topVariable,topVari,topVart,topVare;
     BDD_ID high, low;
+    BDD_ID Computed_table_ID;
     TableRow new_row_data;
     TableRow *check_row_data;
     string* temp_label = &label_storage;
@@ -192,7 +193,11 @@ BDD_ID Manager::ite(BDD_ID i, BDD_ID t, BDD_ID e)
             }
         }
     }
-
+    check_row_data = computed_table.getRowByData(high,low,topVariable);
+    if (check_row_data != nullptr)
+    {
+        return check_row_data->id;
+    }
     /*Find top variable*/
     topVari =  ((i!=1)&(i!=0))? topVar(i): LIMIT;
     topVart =  ((t!=1)&(t!=0))? topVar(t): LIMIT;
@@ -216,7 +221,12 @@ BDD_ID Manager::ite(BDD_ID i, BDD_ID t, BDD_ID e)
     {
         new_row_data = {0,*temp_label,high,low,topVariable};
         label_storage = "";
-        return unique_table.addRow(&new_row_data); 
+        Computed_table_ID = unique_table.addRow(&new_row_data);
+        new_row_data = {Computed_table_ID,*temp_label,high,low,topVariable};
+        computed_table.addRow_Computed(&new_row_data);
+        return Computed_table_ID;
+
+
     }
 }
 
@@ -379,6 +389,7 @@ void Manager::addToSet(std::set<BDD_ID> &nodes_of_root , BDD_ID id , bool node =
  */
 void Manager::print_table() {
     unique_table.displayTable();
+    computed_table.displayTable();
 }
 
 /**

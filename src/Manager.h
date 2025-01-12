@@ -87,6 +87,7 @@ namespace ClassProject {
 
     private:
         DynamicTable unique_table;
+        DynamicTable computed_table;
         const BDD_ID FALSE_ROW = 0;
         const BDD_ID TRUE_ROW = 1;
     };
