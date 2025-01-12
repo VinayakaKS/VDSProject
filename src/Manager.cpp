@@ -354,6 +354,7 @@ void Manager::findNodesOrVars(const BDD_ID &root, std::set<BDD_ID> &nodes_of_roo
             addToSet(nodes_of_root , tr->topVar , node);
         }
         
+        // Only continue recursing when addToSet is successful
         addToSet(nodes_of_root , tr->high , node);
         addToSet(nodes_of_root , tr->low , node);
         if(!isConstant(tr->high)) {
