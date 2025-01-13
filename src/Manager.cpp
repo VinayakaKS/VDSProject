@@ -13,10 +13,13 @@ string label_storage;
  * Creates a node for the variable given.
  */
 BDD_ID Manager::createVar(const std::string &label) {
+    /*
     std::regex pattern("^!?[A-Za-z0-9]([+*^!][A-Za-z0-9])*$");
     if(!std::regex_match(label, pattern)) {
         throw std::runtime_error("Variable label is not valid. A valid label should contain one or more single alphabets seperated by logical operators (+ * ^ !) or starting with !");
     }
+    */
+    
 
     if(unique_table.getRowByLabel(label)) {
         throw std::runtime_error("Variable label already exists. Please try a new label");
@@ -173,9 +176,10 @@ BDD_ID Manager::ite(BDD_ID i, BDD_ID t, BDD_ID e)
 {
     BDD_ID topVariable,topVari,topVart,topVare;
     BDD_ID high, low;
-    BDD_ID Computed_table_ID;
+    BDD_ID Cp_ID;
     TableRow new_row_data;
-    TableRow *check_row_data;
+    size_t check_row_data_ID,CPT_Id;
+    CPTableRow *check_cp_row_data, new_cpt_row;
     string* temp_label = &label_storage;
 
     /*Invalid BDD_ID exception*/
@@ -194,56 +198,62 @@ BDD_ID Manager::ite(BDD_ID i, BDD_ID t, BDD_ID e)
         TableRow *data = getData(i);
         if(isVariable(i)) {
             /*Check for the redundancy*/
-            check_row_data = unique_table.getRowByData(data->low,data->high,data->topVar);
-            if(check_row_data != nullptr){
-                return check_row_data->id;
+            check_row_data_ID = unique_table.getRowByData({data->low,data->high,data->topVar});
+            if(check_row_data_ID != -1){
+                return check_row_data_ID;
             }
             else  
             {
-                string label = "neg("+ data->label+")";
+                string label = "";//"neg("+ data->label+")";
                 new_row_data = {0,label,data->low,data->high,data->topVar};
                 return unique_table.addRow(&new_row_data);
             }
         }
     }
-    check_row_data = computed_table.getRowByData(high,low,topVariable);
-    if (check_row_data != nullptr)
+    
+    CPT_Id = computed_table.getCPRowByHash({i,t,e});
+    if(CPT_Id != -1)
     {
-        return check_row_data->id;
+        // cout<<"Returned a CP table result "<< CPT_Id<<endl;
+        return CPT_Id;
     }
-    /*Find top variable*/
-    topVari =  ((i!=1)&(i!=0))? topVar(i): LIMIT;
-    topVart =  ((t!=1)&(t!=0))? topVar(t): LIMIT;
-    topVare =  ((e!=1)&(e!=0))? topVar(e): LIMIT;
 
-    topVariable = min(topVari,topVart);
-    topVariable = min(topVariable,topVare);
+    else {
+        /*Find top variable*/
+        topVari =  ((i!=1)&(i!=0))? topVar(i): LIMIT;
+        topVart =  ((t!=1)&(t!=0))? topVar(t): LIMIT;
+        topVare =  ((e!=1)&(e!=0))? topVar(e): LIMIT;
 
-    /*Recursive ite to find successors*/
-    high = ite(coFactorTrue(i,topVariable),coFactorTrue(t,topVariable),coFactorTrue(e,topVariable));
-    low = ite(coFactorFalse(i,topVariable),coFactorFalse(t,topVariable),coFactorFalse(e,topVariable));
+        topVariable = min(topVari,topVart);
+        topVariable = min(topVariable,topVare);
 
-    /*Reduction rule*/
-    if(high == low) {
-        return high;
+        /*Recursive ite to find successors*/
+        high = ite(coFactorTrue(i,topVariable),coFactorTrue(t,topVariable),coFactorTrue(e,topVariable));
+        low = ite(coFactorFalse(i,topVariable),coFactorFalse(t,topVariable),coFactorFalse(e,topVariable));
+
+        /*Reduction rule*/
+        if(high == low) {
+            return high;
+        }
+
+        /*Check for the redundancy*/
+        check_row_data_ID = unique_table.getRowByData({high,low,topVariable});
+        if(check_row_data_ID != -1)
+        {
+            //cout<<"entering in for redundancy check for Unique table"<<endl;
+            return check_row_data_ID;
+        }
+        else
+        {
+            new_row_data = {0,*temp_label,high,low,topVariable};
+            label_storage = "";
+            Cp_ID = unique_table.addRow(&new_row_data); 
+            new_cpt_row = {Cp_ID,i,t,e};
+            computed_table.addRowCPTable(&new_cpt_row); 
+            return Cp_ID;
+        }
     }
-    /*Check for the redundancy*/
-    check_row_data = unique_table.getRowByData(high,low,topVariable);
-    if(check_row_data != nullptr)
-    {
-        return check_row_data->id;
-    }
-    else
-    {
-        new_row_data = {0,*temp_label,high,low,topVariable};
-        label_storage = "";
-        Computed_table_ID = unique_table.addRow(&new_row_data);
-        new_row_data = {Computed_table_ID,*temp_label,high,low,topVariable};
-        computed_table.addRow_Computed(&new_row_data);
-        return Computed_table_ID;
-
-
-    }
+    
 }
 
 /**
@@ -268,7 +278,7 @@ BDD_ID Manager::and2(BDD_ID a, BDD_ID b) //ite(a,b,0)
         throw std::runtime_error("Invalid BDD_ID given for and operation");
     }
         
-    label_storage = getData(a)->label + " and " + getData(b)->label; 
+    label_storage = "";//getData(a)->label + " and " + getData(b)->label; 
     return ite(a,b,0);
 }
 
@@ -282,7 +292,7 @@ BDD_ID Manager::or2(BDD_ID a, BDD_ID b) //ite(a,1,b)
         throw std::runtime_error("Invalid BDD_ID given for or operation");
     }
         
-    label_storage = getData(a)->label + " or " + getData(b)->label; 
+    label_storage = "";//getData(a)->label + " or " + getData(b)->label; 
     return ite(a,1,b);
 }
 
@@ -297,7 +307,7 @@ BDD_ID Manager::xor2(BDD_ID a, BDD_ID b) //ite(a,neg_b,b)
     }
         
     BDD_ID neg_b = neg(b);
-    label_storage = getData(a)->label + " xor " + getData(b)->label; 
+    label_storage = "";//getData(a)->label + " xor " + getData(b)->label; 
     return ite(a,neg_b,b);
 }
 

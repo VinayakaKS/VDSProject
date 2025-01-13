@@ -85,9 +85,11 @@ namespace ClassProject {
 
         void addToSet(set<BDD_ID> &nodes_of_root , BDD_ID id , bool node);
 
-    private:
+        DynTable computed_table;
         DynamicTable unique_table;
-        DynamicTable computed_table;
+
+
+    private:
         const BDD_ID FALSE_ROW = 0;
         const BDD_ID TRUE_ROW = 1;
     };
