@@ -10,6 +10,79 @@ const size_t LIMIT = 9999999999;
 const size_t HIGH = 1;
 const size_t LOW = 0;
 
+
+struct CPTableRow{
+    size_t id;
+    size_t i;
+    size_t t;
+    size_t e;
+    CPTableRow(size_t id = LIMIT, size_t i = LIMIT, size_t t = LIMIT, size_t e = LIMIT)
+        : id(id),i(i), t(t), e(e) {}
+
+};
+
+struct CPTkey{
+    size_t i;
+    size_t t;
+    size_t e;
+
+    // Define equality operator - Avoids the collision
+    bool operator==(const CPTkey& other) const {
+        return i == other.i && t == other.t && e == other.e;
+    }
+};
+
+// Define a hash function for CPTableRow
+struct CPTHash {
+    std::size_t operator()(const CPTkey& row) const {
+        return std::hash<size_t>()(row.i) ^ 
+               (std::hash<size_t>()(row.t) << 1) ^ 
+               (std::hash<size_t>()(row.e) << 2);
+    }
+};
+
+// Computed Table class
+class DynTable{
+    vector<CPTableRow> UniqueTable;             // Stores rows in Unique table
+    unordered_map<CPTkey,size_t, CPTHash> rowDataMap;
+
+public:
+    void addRowCPTable(CPTableRow *row_data) {
+        if(row_data->i == LIMIT) {
+            row_data->i = HIGH;
+        }
+
+        if(row_data->t == LIMIT) {
+            row_data->t = HIGH;
+        }
+
+        if(row_data->e == LIMIT) {
+            row_data->e = LOW;
+        }
+
+        CPTableRow data = {row_data->id,row_data->i,row_data->t,row_data->e};
+        UniqueTable.push_back(data);
+        rowDataMap[{row_data->i,row_data->t,row_data->e}] = row_data->id;
+    }
+
+    size_t getCPRowByHash(CPTkey data) {
+        auto it = rowDataMap.find(data);
+        if ( it != rowDataMap.end()) {
+            return it->second;
+        }
+        return -1;
+    }
+
+    // Display the table
+    void displayTable() const {
+        cout<<"\nComputed Table"<<endl;
+        std::cout << endl << "BDD_ID\t\tI\tT\tE\n";
+        for (const auto &row : UniqueTable) {
+            std::cout << row.id << "\t\t"<< row.i << "\t" << row.t << "\t" << row.e << "\n";
+        }
+    }
+};
+
 // Row structure
 struct TableRow {
     size_t id;                       // Unique identifier
@@ -22,11 +95,32 @@ struct TableRow {
         : id(id), label(label), high(high), low(low), topVar(topVar) {}
 };
 
-// Table class
+struct UTkey{
+    size_t high;
+    size_t low;
+    size_t topVar;
+
+    // Define equality operator - Avoids the collision
+    bool operator==(const UTkey& other) const {
+        return high == other.high && low == other.low && topVar == other.topVar;
+    }
+};
+
+// Define a hash function for CPTableRow
+struct UTHash {
+    std::size_t operator()(const UTkey& row) const {
+        return std::hash<size_t>()(row.high) ^ 
+               (std::hash<size_t>()(row.low) << 1) ^ 
+               (std::hash<size_t>()(row.topVar) << 2);
+    }
+};
+
+// Unique Table class
 class DynamicTable {
-    vector<TableRow> UniqueTable;             // Stores rows in Unique table
-    unordered_map<size_t, size_t> idMap;         // Maps id to index in `UniqueTable` for fast lookup
-    unordered_map<string, size_t> labelMap;         // Maps id to index in `UniqueTable` for fast lookup
+    vector<TableRow> UniqueTable;                    // Stores rows in Unique table
+    unordered_map<size_t, size_t> idMap;             // Maps id to index in `UniqueTable` for fast lookup
+    unordered_map<string, size_t> labelMap;          // Maps id to index in `UniqueTable` for fast lookup
+    unordered_map<UTkey,size_t,UTHash> rowMap;
 
     public:
         size_t last_id = 0;
@@ -46,9 +140,10 @@ class DynamicTable {
 
             TableRow data = {last_id, row_data->label,row_data->high,row_data->low,row_data->topVar};
             UniqueTable.push_back(data);
-            cout<< "Row added - "<< last_id<< " "<<row_data->label <<endl;
+            cout<<"Added row "<< last_id<<endl;
             idMap[last_id++] = UniqueTable.size() - 1;
             labelMap[row_data->label] = UniqueTable.size() - 1;
+            rowMap[{row_data->high,row_data->low,row_data->topVar}] = UniqueTable.size() - 1;
             return (last_id - 1);
         }
     size_t addRow_Computed(TableRow *row_data) {
@@ -86,23 +181,21 @@ class DynamicTable {
         }
 
         // Get a row by data
-        TableRow* getRowByData(size_t high , size_t low , size_t topVar) {
-            for (const auto& row : UniqueTable) {
-                if (row.high == high && row.low == low && row.topVar == topVar) {
-                    // Found the row, use it
-                    return &UniqueTable[row.id];
-                }
+        size_t getRowByData(UTkey data) {
+            auto it = rowMap.find(data);
+            if(it != rowMap.end()){
+                return it->second;
             }
-
-            return nullptr;
+            
+            return -1;
         }
-
 
         // Display the table
         void displayTable() const {
-            std::cout << endl << "BDD_ID\tLabel\t\t\tHigh\tLow\tTopVar\n";
+            cout<<"\nUnique Table"<<endl;
+            std::cout << endl << "BDD_ID\tLabel\tHigh\tLow\tTopVar\n";
             for (const auto &row : UniqueTable) {
-                std::cout << row.id << "\t" << row.label << "\t\t\t" << row.high << "\t" << row.low << "\t" << row.topVar << "\n";
+                std::cout << row.id << "\t" << row.label << "\t" << row.high << "\t" << row.low << "\t" << row.topVar << "\n";
             }
         }
 
