@@ -118,7 +118,7 @@ struct UTHash {
 // Unique Table class
 class DynamicTable {
     vector<TableRow> UniqueTable;                    // Stores rows in Unique table
-    unordered_map<size_t, size_t> idMap;             // Maps id to index in `UniqueTable` for fast lookup
+    // unordered_map<size_t, size_t> idMap;             // Maps id to index in `UniqueTable` for fast lookup
     unordered_map<string, size_t> labelMap;          // Maps id to index in `UniqueTable` for fast lookup
     unordered_map<UTkey,size_t,UTHash> rowMap;
 
@@ -141,7 +141,8 @@ class DynamicTable {
             TableRow data = {last_id, row_data->label,row_data->high,row_data->low,row_data->topVar};
             UniqueTable.push_back(data);
             // cout<<"Added row "<< last_id<<endl;
-            idMap[last_id++] = UniqueTable.size() - 1;
+            // idMap[last_id++] = UniqueTable.size() - 1;
+            last_id++;
             labelMap[row_data->label] = UniqueTable.size() - 1;
             rowMap[{row_data->high,row_data->low,row_data->topVar}] = UniqueTable.size() - 1;
             return (last_id - 1);
@@ -160,16 +161,20 @@ class DynamicTable {
             }
             UniqueTable.push_back(*row_data);
             // cout<< "Row added - "<< row_data->id << " "<<row_data->label <<endl;
-            idMap[row_data->id] = UniqueTable.size() - 1;
+            // idMap[row_data->id] = UniqueTable.size() - 1;
             labelMap[row_data->label] = UniqueTable.size() - 1;
             return row_data->id;
         }
         // Get a row by id
         TableRow* getRowById(size_t id) {
-            if (idMap.find(id) != idMap.end()) {
-                return &UniqueTable[idMap[id]];
+            if(id < last_id) {
+                return &UniqueTable[id];
+            } else {
+                return nullptr;
             }
-            return nullptr;
+            // if (idMap.find(id) != idMap.end()) {
+            //     return &UniqueTable[idMap[id]];
+            // }
         }
 
         // Get a row by label
@@ -209,7 +214,7 @@ class DynamicTable {
         {
             // Clear all data structures
             UniqueTable.clear();          // Clears the vector containing table rows
-            idMap.clear();                // Clears the idMap
+            // idMap.clear();                // Clears the idMap
             labelMap.clear();             // Clears the labelMap
             last_id = 0;                  // Reset the last_id counter
             cout << "Table has been deleted." << endl;
