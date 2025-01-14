@@ -83,7 +83,7 @@ namespace ClassProject {
 
         void findNodesOrVars(const BDD_ID &root, set<BDD_ID> &nodes_of_root , bool node);
 
-        void addToSet(set<BDD_ID> &nodes_of_root , BDD_ID id , bool node);
+        bool addToSet(set<BDD_ID> &nodes_of_root , BDD_ID id , bool node);
 
         DynTable computed_table;
         DynamicTable unique_table;

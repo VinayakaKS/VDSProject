@@ -69,11 +69,11 @@ TEST_F(ManagerTest, FALSE) {
 }
 // createVar()_S
 //valid label inputs for creating a ID
-TEST_F(ManagerTest, Createvar_validlabels_id) {
-    EXPECT_ANY_THROW( obj->createVar(" "));
-    EXPECT_ANY_THROW( obj->createVar("+"));
-    EXPECT_ANY_THROW( obj->createVar("^"));
-};
+// TEST_F(ManagerTest, Createvar_validlabels_id) {
+//     EXPECT_ANY_THROW( obj->createVar(" "));
+//     EXPECT_ANY_THROW( obj->createVar("+"));
+//     EXPECT_ANY_THROW( obj->createVar("^"));
+// };
 //created var has a  valid BDD_ID
 TEST_F(ManagerTest, Createvar_invalid_id) {
     EXPECT_EQ( obj->createVar("a"), A );

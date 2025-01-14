@@ -13,12 +13,12 @@ string label_storage;
  * Creates a node for the variable given.
  */
 BDD_ID Manager::createVar(const std::string &label) {
-    /*
-    std::regex pattern("^!?[A-Za-z0-9]([+*^!][A-Za-z0-9])*$");
-    if(!std::regex_match(label, pattern)) {
-        throw std::runtime_error("Variable label is not valid. A valid label should contain one or more single alphabets seperated by logical operators (+ * ^ !) or starting with !");
-    }
-    */
+    
+    // std::regex pattern("^!?[A-Za-z0-9]([+*^!][A-Za-z0-9])*$");
+    // if(!std::regex_match(label, pattern)) {
+    //     throw std::runtime_error("Variable label is not valid. A valid label should contain one or more single alphabets seperated by logical operators (+ * ^ !) or starting with !");
+    // }
+    
     
 
     if(unique_table.getRowByLabel(label)) {
@@ -37,8 +37,8 @@ BDD_ID Manager::createVar(const std::string &label) {
  *          false : if not a constant 
  */
 bool Manager::isConstant(BDD_ID f) {
-    TableRow* tr = getData(f);
-    if(tr) {
+    // TableRow* tr = getData(f);
+    if(!(f > return_lastID())) {
         return (f == FALSE_ROW || f == TRUE_ROW) ;
     } else {
         throw std::runtime_error("Row with this id does not exist.");
@@ -195,18 +195,21 @@ BDD_ID Manager::ite(BDD_ID i, BDD_ID t, BDD_ID e)
     if(t==1 && e==0) return i;               //ite(i,1,0)
     if(t==0 && e==1)                         //ite(i,0,1) should return neg(i)
     {
-        TableRow *data = getData(i);
         if(isVariable(i)) {
+            TableRow *data = getData(i);
             /*Check for the redundancy*/
             check_row_data_ID = unique_table.getRowByData({data->low,data->high,data->topVar});
-            if(check_row_data_ID != -1){
+            if(check_row_data_ID != -1){ 
                 return check_row_data_ID;
             }
             else  
             {
                 string label = "";//"neg("+ data->label+")";
                 new_row_data = {0,label,data->low,data->high,data->topVar};
-                return unique_table.addRow(&new_row_data);
+                check_row_data_ID = unique_table.addRow(&new_row_data);
+                new_cpt_row = {check_row_data_ID,i,t,e};
+                computed_table.addRowCPTable(&new_cpt_row);
+                return check_row_data_ID;
             }
         }
     }
@@ -241,6 +244,8 @@ BDD_ID Manager::ite(BDD_ID i, BDD_ID t, BDD_ID e)
         if(check_row_data_ID != -1)
         {
             //cout<<"entering in for redundancy check for Unique table"<<endl;
+            new_cpt_row = {check_row_data_ID,i,t,e};
+            computed_table.addRowCPTable(&new_cpt_row); 
             return check_row_data_ID;
         }
         else
@@ -260,8 +265,8 @@ BDD_ID Manager::ite(BDD_ID i, BDD_ID t, BDD_ID e)
  *  Performs negation on the given node and returns the row ID of result
  */
 BDD_ID Manager::neg(BDD_ID a) {
-    TableRow* tr = getData(a); 
-    if(tr) {
+    // TableRow* tr = getData(a); 
+    if(!(a > return_lastID())) {
         return ite(a , FALSE_ROW , TRUE_ROW);
     } else {
         throw std::runtime_error("Row with this id does not exist.");
@@ -316,9 +321,9 @@ BDD_ID Manager::xor2(BDD_ID a, BDD_ID b) //ite(a,neg_b,b)
  */
 BDD_ID Manager::nand2(BDD_ID a, BDD_ID b) //ite(a,b,0)
 {
-    TableRow* tra = getData(a); 
-    TableRow* trb = getData(b); 
-    if(&tra && &trb) {
+    // TableRow* tra = getData(a); 
+    // TableRow* trb = getData(b); 
+    if(!(a > return_lastID() || b > return_lastID())) {
         return ite(a , neg(b) , TRUE_ROW);
     } else {
         throw std::runtime_error("Rows with these ids do not exist.");
@@ -329,9 +334,9 @@ BDD_ID Manager::nand2(BDD_ID a, BDD_ID b) //ite(a,b,0)
  * Performs nor operation on the given nodes and returns the row ID of result
  */
 BDD_ID Manager::nor2(BDD_ID a, BDD_ID b) {
-    TableRow* tra = getData(a); 
-    TableRow* trb = getData(b); 
-    if(&tra && &trb) {
+    // TableRow* tra = getData(a); 
+    // TableRow* trb = getData(b); 
+    if(!(a > return_lastID() || b > return_lastID())) {
         return ite(a , FALSE_ROW , neg(b));
     } else {
         throw std::runtime_error("Rows with these ids do not exist.");
@@ -342,9 +347,9 @@ BDD_ID Manager::nor2(BDD_ID a, BDD_ID b) {
  * Performs exclusive nor operation on the given nodes and returns the row ID of result
  */
 BDD_ID Manager::xnor2(BDD_ID a, BDD_ID b) {
-    TableRow* tra = getData(a); 
-    TableRow* trb = getData(b); 
-    if(&tra && &trb) {
+    // TableRow* tra = getData(a); 
+    // TableRow* trb = getData(b); 
+    if(!(a > return_lastID() || b > return_lastID())) {
         return ite(a , b , neg(b));
     } else {
         throw std::runtime_error("Rows with these ids do not exist.");
@@ -415,9 +420,11 @@ void Manager::findNodesOrVars(const BDD_ID &root, std::set<BDD_ID> &nodes_of_roo
     }
 }    
 
-void Manager::addToSet(std::set<BDD_ID> &nodes_of_root , BDD_ID id , bool node = true ) {
+bool Manager::addToSet(std::set<BDD_ID> &nodes_of_root , BDD_ID id , bool node = true ) {
     if(node || (!node && isVariable(id))) {
-        nodes_of_root.insert(id);
+        return (nodes_of_root.insert(id).second);
+    } else {
+        return false;
     }
 }
 

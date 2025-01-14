@@ -48,20 +48,20 @@ class DynTable{
 
 public:
     void addRowCPTable(CPTableRow *row_data) {
-        if(row_data->i == LIMIT) {
-            row_data->i = HIGH;
-        }
+        // if(row_data->i == LIMIT) {
+        //     row_data->i = HIGH;
+        // }
 
-        if(row_data->t == LIMIT) {
-            row_data->t = HIGH;
-        }
+        // if(row_data->t == LIMIT) {
+        //     row_data->t = HIGH;
+        // }
 
-        if(row_data->e == LIMIT) {
-            row_data->e = LOW;
-        }
+        // if(row_data->e == LIMIT) {
+        //     row_data->e = LOW;
+        // }
 
-        CPTableRow data = {row_data->id,row_data->i,row_data->t,row_data->e};
-        UniqueTable.push_back(data);
+        // CPTableRow data = {row_data->id,row_data->i,row_data->t,row_data->e};
+        UniqueTable.push_back(*row_data);
         rowDataMap[{row_data->i,row_data->t,row_data->e}] = row_data->id;
     }
 
@@ -140,7 +140,7 @@ class DynamicTable {
 
             TableRow data = {last_id, row_data->label,row_data->high,row_data->low,row_data->topVar};
             UniqueTable.push_back(data);
-            cout<<"Added row "<< last_id<<endl;
+            // cout<<"Added row "<< last_id<<endl;
             idMap[last_id++] = UniqueTable.size() - 1;
             labelMap[row_data->label] = UniqueTable.size() - 1;
             rowMap[{row_data->high,row_data->low,row_data->topVar}] = UniqueTable.size() - 1;
@@ -159,7 +159,7 @@ class DynamicTable {
                 row_data->low = LOW;
             }
             UniqueTable.push_back(*row_data);
-            cout<< "Row added - "<< row_data->id << " "<<row_data->label <<endl;
+            // cout<< "Row added - "<< row_data->id << " "<<row_data->label <<endl;
             idMap[row_data->id] = UniqueTable.size() - 1;
             labelMap[row_data->label] = UniqueTable.size() - 1;
             return row_data->id;
