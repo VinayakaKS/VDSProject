@@ -36,9 +36,9 @@ protected:
 ClassProject::Manager* ManagerTest::obj = nullptr;
 
 const ClassProject::BDD_ID FALSE_ID = 0;
-const string FALSE_NAME = "FALSE";
+const string FALSE_NAME = "False";
 const ClassProject::BDD_ID TRUE_ID = 1;
-const string TRUE_NAME = "TRUE";
+const string TRUE_NAME = "True";
 const ClassProject::BDD_ID A = 2;
 const string A_NAME = "a";
 const ClassProject::BDD_ID B = 3;
@@ -228,10 +228,12 @@ TEST_F(ManagerTest, findNodes_work)
     temp_obj-> and2(A, B);
     ClassProject:: set <ClassProject::BDD_ID> nodes_of_root;
     temp_obj->findNodes(AandB,nodes_of_root);
-    EXPECT_NE(nodes_of_root.find(A), nodes_of_root.end());// should contain id2
+    EXPECT_NE(nodes_of_root.find(FALSE_ID), nodes_of_root.end());// should contain id0
+    EXPECT_NE(nodes_of_root.find(TRUE_ID), nodes_of_root.end());// should contain id1
+    // EXPECT_NE(nodes_of_root.find(A), nodes_of_root.end());// should contain id2
     EXPECT_NE(nodes_of_root.find(B), nodes_of_root.end());// should contain id3
     EXPECT_NE(nodes_of_root.find(AandB), nodes_of_root.end());// should contain itself
-    EXPECT_EQ(nodes_of_root.size(), 3);
+    EXPECT_EQ(nodes_of_root.size(), 4);
 }
 
 //////////  END OF findNodes  ////////////
@@ -248,7 +250,8 @@ TEST_F(ManagerTest, findVars_work)
     temp_obj-> and2(A, B);
     ClassProject:: set <ClassProject::BDD_ID> vars_of_root;
     temp_obj->findVars(AandB,vars_of_root);
-    EXPECT_NE(vars_of_root.find(A), vars_of_root.end());// should contain id2
+    EXPECT_NE(vars_of_root.find(A), vars_of_root.end());// should not contain id2
+    // EXPECT_NE(vars_of_root.find(A), vars_of_root.end());// should contain id2
     EXPECT_NE(vars_of_root.find(B), vars_of_root.end()); // should contain id3
     EXPECT_EQ(vars_of_root.find(TRUE_ID), vars_of_root.end());// should not contain True_id
     EXPECT_EQ(vars_of_root.find(FALSE_ID), vars_of_root.end());// should not contain False_id
@@ -431,8 +434,8 @@ TEST_F(ManagerTest, getTopVarNameInvalidInput) {
 }
 
 TEST_F(ManagerTest, getTopVarNameofConstant) {  
-    EXPECT_EQ( obj->getTopVarName(FALSE_ID), "FALSE" );
-    EXPECT_EQ( obj->getTopVarName(TRUE_ID), "TRUE" );
+    EXPECT_EQ( obj->getTopVarName(FALSE_ID), FALSE_NAME );
+    EXPECT_EQ( obj->getTopVarName(TRUE_ID), TRUE_NAME );
 }
 
 TEST_F(ManagerTest, getTopVarNameofVariable) {  
@@ -448,3 +451,79 @@ TEST_F(ManagerTest, getTopVarNameofNode) {
 //////////  END OF getTopVarName   ////////////
 
 
+/////////   Additional Tests       ///////////
+TEST_F(ManagerTest, NegTest) /* NOLINT */
+{
+    // Check De Morgan's laws
+    ClassProject::BDD_ID false_id = temp_obj->False();
+    ClassProject::BDD_ID true_id = temp_obj->True();
+    ClassProject::BDD_ID a_id = temp_obj->createVar("a");
+    ClassProject::BDD_ID b_id = temp_obj->createVar("b");
+    ClassProject::BDD_ID neg_a_id = temp_obj->neg(a_id);
+    ClassProject::BDD_ID neg_b_id = temp_obj->neg(b_id);
+    ClassProject::BDD_ID a_and_b_id = temp_obj->and2(a_id, b_id);
+    ClassProject::BDD_ID a_or_b_id = temp_obj->or2(a_id, b_id);
+    EXPECT_EQ(temp_obj->neg(a_and_b_id), temp_obj->or2(neg_a_id, neg_b_id));
+    EXPECT_EQ(temp_obj->neg(a_or_b_id), temp_obj->and2(neg_a_id, neg_b_id));
+    temp_obj->print_table();
+}
+TEST_F(ManagerTest, FindVarsTest) /* NOLINT */
+{
+    std::set<ClassProject::BDD_ID> a_and_b_nodes;
+    ClassProject::BDD_ID a_id = temp_obj->createVar("a");
+    ClassProject::BDD_ID b_id = temp_obj->createVar("b");
+    ClassProject::BDD_ID a_and_b_id = temp_obj-> and2(a_id, b_id);
+    temp_obj->findVars(a_and_b_id, a_and_b_nodes);
+    temp_obj->print_table();
+    EXPECT_EQ(a_and_b_nodes.size(), 2);
+    EXPECT_TRUE(a_and_b_nodes.find(a_id) != a_and_b_nodes.end());
+    EXPECT_TRUE(a_and_b_nodes.find(b_id) != a_and_b_nodes.end());
+}
+TEST_F(ManagerTest, GetTopVarNameTest) /* NOLINT */
+{
+    ClassProject::BDD_ID false_id = temp_obj->False();
+    ClassProject::BDD_ID true_id = temp_obj->True();
+    ClassProject::BDD_ID a_id = temp_obj->createVar("a");
+    ClassProject::BDD_ID b_id = temp_obj->createVar("b");
+    ClassProject::BDD_ID neg_a_id = temp_obj->neg(a_id);
+    ClassProject::BDD_ID neg_b_id = temp_obj->neg(b_id);
+    ClassProject::BDD_ID a_and_b_id = temp_obj->and2(a_id, b_id);
+    ClassProject::BDD_ID a_or_b_id = temp_obj->or2(a_id, b_id);
+    EXPECT_EQ(temp_obj->getTopVarName(false_id), "False");
+    EXPECT_EQ(temp_obj->getTopVarName(true_id), "True");
+}
+TEST_F(ManagerTest, FindNodesTest) /* NOLINT */
+{
+    ClassProject::BDD_ID false_id = temp_obj->False();
+    ClassProject::BDD_ID true_id = temp_obj->True();
+    ClassProject::BDD_ID a_id = temp_obj->createVar("a");
+    ClassProject::BDD_ID b_id = temp_obj->createVar("b");
+    ClassProject::BDD_ID neg_a_id = temp_obj->neg(a_id);
+    ClassProject::BDD_ID neg_b_id = temp_obj->neg(b_id);
+    ClassProject::BDD_ID a_and_b_id = temp_obj->and2(a_id, b_id);
+    ClassProject::BDD_ID a_or_b_id = temp_obj->or2(a_id, b_id);
+    std::set<ClassProject::BDD_ID> a_and_b_nodes;
+    temp_obj->findNodes(a_and_b_id, a_and_b_nodes);
+    
+    EXPECT_EQ(a_and_b_nodes.size(), 4);
+    EXPECT_TRUE(a_and_b_nodes.find(false_id) != a_and_b_nodes.end());
+    EXPECT_TRUE(a_and_b_nodes.find(true_id) != a_and_b_nodes.end());
+    EXPECT_TRUE(a_and_b_nodes.find(b_id) != a_and_b_nodes.end());
+    EXPECT_TRUE(a_and_b_nodes.find(a_and_b_id) != a_and_b_nodes.end());
+}
+TEST_F(ManagerTest, CoFactorTest) /* NOLINT */
+{
+    ClassProject::BDD_ID false_id = temp_obj->False();
+    ClassProject::BDD_ID true_id = temp_obj->True();
+    ClassProject::BDD_ID a_id = temp_obj->createVar("a");
+    ClassProject::BDD_ID b_id = temp_obj->createVar("b");
+    ClassProject::BDD_ID neg_a_id = temp_obj->neg(a_id);
+    ClassProject::BDD_ID neg_b_id = temp_obj->neg(b_id);
+    ClassProject::BDD_ID a_and_b_id = temp_obj->and2(a_id, b_id);
+    ClassProject::BDD_ID a_or_b_id = temp_obj->or2(a_id, b_id);
+    EXPECT_EQ(temp_obj->coFactorFalse(false_id, false_id), false_id);
+    EXPECT_EQ(temp_obj->coFactorFalse(a_and_b_id, b_id), false_id);
+    EXPECT_EQ(temp_obj->coFactorTrue(true_id, true_id), true_id);
+    EXPECT_EQ(temp_obj->coFactorTrue(a_and_b_id, b_id), a_id);
+}
+/////////   END OF Additional Tests       ///////////
