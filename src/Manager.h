@@ -15,8 +15,8 @@ namespace ClassProject {
     
     public:
         Manager() {
-            TableRow true_node = {1,"True",1,1,1};
-            TableRow false_node = {0,"False",0,0,0};
+            TableRow true_node = {0 , "True",1,1,1};
+            TableRow false_node = {1 , "False",0,0,0};
             unique_table.addRow(&false_node);
             unique_table.addRow(&true_node);
         }

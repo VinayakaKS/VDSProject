@@ -7,7 +7,11 @@ using namespace ClassProject;
 #include <string>
 
 typedef size_t BDD_ID;
-string label_storage;
+// string label_storage;
+// #define TRUE_ID  1
+// #define FALSE_ID 0
+// #define ID 0
+
 
 /**
  * Creates a node for the variable given.
@@ -178,8 +182,8 @@ BDD_ID Manager::ite(BDD_ID i, BDD_ID t, BDD_ID e)
     TableRow new_row_data;
     size_t check_row_data_ID,CPT_Id;
     CPTableRow *check_cp_row_data, new_cpt_row;
-    string* temp_label = &label_storage;
-
+    string temp_label = "";
+    
     /*Invalid BDD_ID exception*/
     if(i > return_lastID() || t > return_lastID() || e > return_lastID())
     {
@@ -202,9 +206,10 @@ BDD_ID Manager::ite(BDD_ID i, BDD_ID t, BDD_ID e)
             }
             else  
             {
-                string label = "";//"neg("+ data->label+")";
-                new_row_data = {0,label,data->low,data->high,data->topVar};
-                check_row_data_ID = unique_table.addRow(&new_row_data);
+                // string label = "";//"neg("+ data->label+")";
+                // new_row_data = {0,"",data->low,data->high,data->topVar};
+                new_row_data = {0, temp_label,data->low,data->high,data->topVar};
+                check_row_data_ID = unique_table.addRow( &new_row_data );
                 new_cpt_row = {check_row_data_ID,i,t,e};
                 computed_table.addRowCPTable(&new_cpt_row);
                 return check_row_data_ID;
@@ -212,6 +217,14 @@ BDD_ID Manager::ite(BDD_ID i, BDD_ID t, BDD_ID e)
         }
     }
     
+    //Standard triplets
+    if(i==t){
+        return ite(i,1,e);
+    }
+    if(i==e){
+        return ite(i,t,0);
+    }
+
     CPT_Id = computed_table.getCPRowByHash({i,t,e});
     if(CPT_Id != -1)
     {
@@ -248,15 +261,13 @@ BDD_ID Manager::ite(BDD_ID i, BDD_ID t, BDD_ID e)
         }
         else
         {
-            new_row_data = {0,*temp_label,high,low,topVariable};
-            label_storage = "";
+            new_row_data = {0 , temp_label,high,low,topVariable};
             Cp_ID = unique_table.addRow(&new_row_data); 
             new_cpt_row = {Cp_ID,i,t,e};
             computed_table.addRowCPTable(&new_cpt_row); 
             return Cp_ID;
         }
     }
-    
 }
 
 /**
@@ -281,7 +292,7 @@ BDD_ID Manager::and2(BDD_ID a, BDD_ID b) //ite(a,b,0)
         throw std::runtime_error("Invalid BDD_ID given for and operation");
     }
         
-    label_storage = "";//getData(a)->label + " and " + getData(b)->label; 
+    // label_storage = "";//getData(a)->label + " and " + getData(b)->label; 
     return ite(a,b,0);
 }
 
@@ -295,7 +306,7 @@ BDD_ID Manager::or2(BDD_ID a, BDD_ID b) //ite(a,1,b)
         throw std::runtime_error("Invalid BDD_ID given for or operation");
     }
         
-    label_storage = "";//getData(a)->label + " or " + getData(b)->label; 
+    // label_storage = "";//getData(a)->label + " or " + getData(b)->label; 
     return ite(a,1,b);
 }
 
@@ -310,7 +321,7 @@ BDD_ID Manager::xor2(BDD_ID a, BDD_ID b) //ite(a,neg_b,b)
     }
         
     // BDD_ID neg_b = ;
-    label_storage = "";//getData(a)->label + " xor " + getData(b)->label; 
+    // label_storage = "";//getData(a)->label + " xor " + getData(b)->label; 
     return ite(a,neg(b),b);
 }
 
