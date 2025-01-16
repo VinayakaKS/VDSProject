@@ -218,6 +218,14 @@ BDD_ID Manager::ite(BDD_ID i, BDD_ID t, BDD_ID e)
         }
     }
     
+    //Standard triplets
+    if(i==t){
+        return ite(i,1,e);
+    }
+    if(i==e){
+        return ite(i,t,0);
+    }
+
     CPT_Id = computed_table.getCPRowByHash({i,t,e});
     if(CPT_Id != -1)
     {
