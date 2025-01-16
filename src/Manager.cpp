@@ -91,21 +91,20 @@ BDD_ID Manager::coFactorTrue(BDD_ID f, BDD_ID x){
         throw std::runtime_error("Not a variable or constant - True cofactor doesnt exist");
     }
          
-    TableRow* row;
-    if(topVar(f) == x)
+    TableRow* row = getData(f);
+    if(row->topVar == x)
     {
-        row = getData(f);
         return row->high;
     } else if (f == FALSE_ROW || f == TRUE_ROW) {
         return f;
     }
         
     // x is not the top variable: recursively compute cofactor for subfunctions
-    BDD_ID lowBranch = coFactorTrue(getData(f)->low, x);
-    BDD_ID highBranch = coFactorTrue(getData(f)->high, x);
+    BDD_ID lowBranch = coFactorTrue(row->low, x);
+    BDD_ID highBranch = coFactorTrue(row->high, x);
     
     // Reconstruct the ITE for the function without x
-    return ite(topVar(f), highBranch, lowBranch);
+    return ite(row->topVar, highBranch, lowBranch);
 }
 
 /**
@@ -126,21 +125,20 @@ BDD_ID Manager::coFactorFalse(BDD_ID f, BDD_ID x){
         throw std::runtime_error("Not a variable or constant - True cofactor doesnt exist");
     }
         
-    TableRow* row;
-    if(topVar(f) == x)
+    TableRow* row = getData(f);
+    if(row->topVar == x)
     {
-        row = getData(f);
         return row->low;
     } else if (f == FALSE_ROW || f == TRUE_ROW) {
         return f;
     }
 
     // x is not the top variable: recursively compute cofactor for subfunctions
-    BDD_ID lowBranch = coFactorFalse(getData(f)->low, x);
-    BDD_ID highBranch = coFactorFalse(getData(f)->high, x);
+    BDD_ID lowBranch = coFactorFalse(row->low, x);
+    BDD_ID highBranch = coFactorFalse(row->high, x);
     
     // Reconstruct the ITE for the function without x
-    return ite(topVar(f), highBranch, lowBranch);
+    return ite(row->topVar, highBranch, lowBranch);
 }
 
 /**
@@ -311,9 +309,9 @@ BDD_ID Manager::xor2(BDD_ID a, BDD_ID b) //ite(a,neg_b,b)
         throw std::runtime_error("Invalid BDD_ID given for xor operation");
     }
         
-    BDD_ID neg_b = neg(b);
+    // BDD_ID neg_b = ;
     label_storage = "";//getData(a)->label + " xor " + getData(b)->label; 
-    return ite(a,neg_b,b);
+    return ite(a,neg(b),b);
 }
 
 /**
@@ -407,14 +405,17 @@ void Manager::findNodesOrVars(const BDD_ID &root, std::set<BDD_ID> &nodes_of_roo
         }
         
         // Only continue recursing when addToSet is successful
-        addToSet(nodes_of_root , tr->high , node);
-        addToSet(nodes_of_root , tr->low , node);
-        if(!isConstant(tr->high)) {
-            findNodesOrVars(tr->high , nodes_of_root , node);
-        }
-        if(!isConstant(tr->low)) {
-            findNodesOrVars(tr->low , nodes_of_root , node);
-        }
+        if(addToSet(nodes_of_root , tr->high , node)) {
+            if(!isConstant(tr->high)) {
+                findNodesOrVars(tr->high , nodes_of_root , node);
+            }
+        };
+        
+        if(addToSet(nodes_of_root , tr->low , node)) {
+            if(!isConstant(tr->low)) {
+                findNodesOrVars(tr->low , nodes_of_root , node);
+            }
+        };
     } else {
         throw std::runtime_error("Row with this id does not exist.");
     }

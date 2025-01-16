@@ -126,8 +126,9 @@ class DynamicTable {
         size_t last_id = 0;
         // Add a row to the table
         size_t addRow(TableRow *row_data) {
+            size_t new_id = last_id;
             if(row_data->topVar == LIMIT) {
-                row_data->topVar = last_id;
+                row_data->topVar = new_id;
             }
 
             if(row_data->high == LIMIT) {
@@ -138,33 +139,34 @@ class DynamicTable {
                 row_data->low = LOW;
             }
 
-            TableRow data = {last_id, row_data->label,row_data->high,row_data->low,row_data->topVar};
-            UniqueTable.push_back(data);
+            row_data->id = new_id;
+            // TableRow data = {last_id, row_data->label,row_data->high,row_data->low,row_data->topVar};
+            UniqueTable.push_back(*row_data);
             // cout<<"Added row "<< last_id<<endl;
             // idMap[last_id++] = UniqueTable.size() - 1;
+            labelMap[row_data->label] = new_id;
+            rowMap[{row_data->high,row_data->low,row_data->topVar}] = new_id;
             last_id++;
-            labelMap[row_data->label] = UniqueTable.size() - 1;
-            rowMap[{row_data->high,row_data->low,row_data->topVar}] = UniqueTable.size() - 1;
-            return (last_id - 1);
+            return new_id;
         }
-    size_t addRow_Computed(TableRow *row_data) {
-            if(row_data->topVar == LIMIT) {
-                row_data->topVar = last_id;
-            }
+    // size_t addRow_Computed(TableRow *row_data) {
+    //         if(row_data->topVar == LIMIT) {
+    //             row_data->topVar = last_id;
+    //         }
 
-            if(row_data->high == LIMIT) {
-                row_data->high = HIGH;
-            }
+    //         if(row_data->high == LIMIT) {
+    //             row_data->high = HIGH;
+    //         }
 
-            if(row_data->low == LIMIT) {
-                row_data->low = LOW;
-            }
-            UniqueTable.push_back(*row_data);
-            // cout<< "Row added - "<< row_data->id << " "<<row_data->label <<endl;
-            // idMap[row_data->id] = UniqueTable.size() - 1;
-            labelMap[row_data->label] = UniqueTable.size() - 1;
-            return row_data->id;
-        }
+    //         if(row_data->low == LIMIT) {
+    //             row_data->low = LOW;
+    //         }
+    //         UniqueTable.push_back(*row_data);
+    //         // cout<< "Row added - "<< row_data->id << " "<<row_data->label <<endl;
+    //         // idMap[row_data->id] = UniqueTable.size() - 1;
+    //         labelMap[row_data->label] = UniqueTable.size() - 1;
+    //         return row_data->id;
+    //     }
         // Get a row by id
         TableRow* getRowById(size_t id) {
             if(id < last_id) {
@@ -172,9 +174,12 @@ class DynamicTable {
             } else {
                 return nullptr;
             }
-            // if (idMap.find(id) != idMap.end()) {
-            //     return &UniqueTable[idMap[id]];
+
+            // auto it = idMap.find(id);
+            // if (it != idMap.end()) {
+            //     return &UniqueTable[it->second];
             // }
+            // return nullptr;
         }
 
         // Get a row by label
