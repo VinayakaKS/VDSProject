@@ -7,11 +7,6 @@ using namespace ClassProject;
 #include <string>
 
 typedef size_t BDD_ID;
-// string label_storage;
-// #define TRUE_ID  1
-// #define FALSE_ID 0
-// #define ID 0
-
 
 /**
  * Creates a node for the variable given.
@@ -28,7 +23,7 @@ BDD_ID Manager::createVar(const std::string &label) {
     if(unique_table.getRowByLabel(label)) {
         throw std::runtime_error("Variable label already exists. Please try a new label");
     } else {
-        TableRow new_var = { 0 , label};
+        TableRow new_var = {label};
         return unique_table.addRow(&new_var);
     }
 }
@@ -41,7 +36,6 @@ BDD_ID Manager::createVar(const std::string &label) {
  *          false : if not a constant 
  */
 bool Manager::isConstant(BDD_ID f) {
-    // TableRow* tr = getData(f);
     if(!(f > return_lastID())) {
         return (f == FALSE_ROW || f == TRUE_ROW) ;
     } else {
@@ -181,7 +175,7 @@ BDD_ID Manager::ite(BDD_ID i, BDD_ID t, BDD_ID e)
     BDD_ID Cp_ID;
     TableRow new_row_data;
     size_t check_row_data_ID,CPT_Id;
-    CPTableRow *check_cp_row_data, new_cpt_row;
+    CPTableRow new_cpt_row;
     string temp_label = "";
     
     /*Invalid BDD_ID exception*/
@@ -197,8 +191,8 @@ BDD_ID Manager::ite(BDD_ID i, BDD_ID t, BDD_ID e)
     if(t==1 && e==0) return i;               //ite(i,1,0)
     if(t==0 && e==1)                         //ite(i,0,1) should return neg(i)
     {
-        if(isVariable(i)) {
-            TableRow *data = getData(i);
+        TableRow *data = getData(i);
+        if(i != FALSE_ROW && i != TRUE_ROW && data->high == TRUE_ROW && data->low == FALSE_ROW && data->topVar == i) {
             /*Check for the redundancy*/
             check_row_data_ID = unique_table.getRowByData({data->low,data->high,data->topVar});
             if(check_row_data_ID != -1){ 
@@ -208,7 +202,7 @@ BDD_ID Manager::ite(BDD_ID i, BDD_ID t, BDD_ID e)
             {
                 // string label = "";//"neg("+ data->label+")";
                 // new_row_data = {0,"",data->low,data->high,data->topVar};
-                new_row_data = {0, temp_label,data->low,data->high,data->topVar};
+                new_row_data = {"",data->low,data->high,data->topVar};
                 check_row_data_ID = unique_table.addRow( &new_row_data );
                 new_cpt_row = {check_row_data_ID,i,t,e};
                 computed_table.addRowCPTable(&new_cpt_row);
@@ -261,7 +255,7 @@ BDD_ID Manager::ite(BDD_ID i, BDD_ID t, BDD_ID e)
         }
         else
         {
-            new_row_data = {0 , temp_label,high,low,topVariable};
+            new_row_data = {"",high,low,topVariable};
             Cp_ID = unique_table.addRow(&new_row_data); 
             new_cpt_row = {Cp_ID,i,t,e};
             computed_table.addRowCPTable(&new_cpt_row); 

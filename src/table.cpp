@@ -82,8 +82,8 @@ struct TableRow {
     size_t low;                      // Points to low side node
     size_t topVar;                   // Top variable
 
-    TableRow(size_t id = LIMIT, const string &label="", size_t high = LIMIT, size_t low = LIMIT, size_t topVar = LIMIT)
-        : id(id), label(label), high(high), low(low), topVar(topVar) {}
+    TableRow(const string &label="", size_t high = LIMIT, size_t low = LIMIT, size_t topVar = LIMIT)
+        :id(LOW) , label(label), high(high), low(low), topVar(topVar) {}
 };
 
 struct UTkey{
