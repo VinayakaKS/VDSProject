@@ -2,6 +2,7 @@
 #include <vector>
 #include <unordered_map>
 #include <string>
+#include <boost/functional/hash.hpp>
 #include <memory> // For smart pointers
 
 using namespace std;
@@ -34,12 +35,26 @@ struct CPTkey{
 
 // Define a hash function for CPTableRow
 struct CPTHash {
+    /*
     std::size_t operator()(const CPTkey& row) const {
         return std::hash<size_t>()(row.i) ^ 
                (std::hash<size_t>()(row.t) << 1) ^ 
                (std::hash<size_t>()(row.e) << 2);
+   
+    */
+
+    size_t operator()(const CPTkey& row) const {
+        size_t hash_key = 0;
+
+        boost::hash_combine(hash_key, boost::hash_value(row.i));
+        boost::hash_combine(hash_key, boost::hash_value(row.t));
+        boost::hash_combine(hash_key, boost::hash_value(row.e));
+
+        return hash_key;
     }
 };
+
+
 
 // Computed Table class
 class DynTable{
@@ -48,18 +63,6 @@ class DynTable{
 
 public:
     void addRowCPTable(CPTableRow *row_data) {
-        // if(row_data->i == LIMIT) {
-        //     row_data->i = HIGH;
-        // }
-
-        // if(row_data->t == LIMIT) {
-        //     row_data->t = HIGH;
-        // }
-
-        // if(row_data->e == LIMIT) {
-        //     row_data->e = LOW;
-        // }
-
         // CPTableRow data = {row_data->id,row_data->i,row_data->t,row_data->e};
         UniqueTable.push_back(*row_data);
         rowDataMap[{row_data->i,row_data->t,row_data->e}] = row_data->id;
@@ -108,24 +111,46 @@ struct UTkey{
 
 // Define a hash function for CPTableRow
 struct UTHash {
+    /*
     std::size_t operator()(const UTkey& row) const {
         return std::hash<size_t>()(row.high) ^ 
                (std::hash<size_t>()(row.low) << 1) ^ 
                (std::hash<size_t>()(row.topVar) << 2);
     }
+    */
+    
+    size_t operator()(const UTkey& row) const {
+        size_t hash_key = 0;
+
+        boost::hash_combine(hash_key, boost::hash_value(row.high));
+        boost::hash_combine(hash_key, boost::hash_value(row.low));
+        boost::hash_combine(hash_key, boost::hash_value(row.topVar));
+
+        return hash_key;
+    }
+};
+
+//A structure to eliminate the id passing
+struct TableRow_AddRow {
+    string label;                    // Label for the row
+    size_t high;                     // Points to the high node
+    size_t low;                      // Points to low side node
+    size_t topVar;                   // Top variable
+
+    TableRow_AddRow(const string &label="", size_t high = LIMIT, size_t low = LIMIT, size_t topVar = LIMIT)
+        : label(label), high(high), low(low), topVar(topVar) {}
 };
 
 // Unique Table class
 class DynamicTable {
     vector<TableRow> UniqueTable;                    // Stores rows in Unique table
-    // unordered_map<size_t, size_t> idMap;             // Maps id to index in `UniqueTable` for fast lookup
     unordered_map<string, size_t> labelMap;          // Maps id to index in `UniqueTable` for fast lookup
     unordered_map<UTkey,size_t,UTHash> rowMap;
 
     public:
         size_t last_id = 0;
         // Add a row to the table
-        size_t addRow(TableRow *row_data) {
+        size_t addRow(TableRow_AddRow *row_data) {
             if(row_data->topVar == LIMIT) {
                 row_data->topVar = last_id;
             }
@@ -140,8 +165,6 @@ class DynamicTable {
 
             TableRow data = {last_id, row_data->label,row_data->high,row_data->low,row_data->topVar};
             UniqueTable.push_back(data);
-            // cout<<"Added row "<< last_id<<endl;
-            // idMap[last_id++] = UniqueTable.size() - 1;
             last_id++;
             labelMap[row_data->label] = UniqueTable.size() - 1;
             rowMap[{row_data->high,row_data->low,row_data->topVar}] = UniqueTable.size() - 1;

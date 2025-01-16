@@ -8,6 +8,9 @@ using namespace ClassProject;
 
 typedef size_t BDD_ID;
 string label_storage;
+#define TRUE_ID  1
+#define FALSE_ID 0
+
 
 /**
  * Creates a node for the variable given.
@@ -24,7 +27,8 @@ BDD_ID Manager::createVar(const std::string &label) {
     if(unique_table.getRowByLabel(label)) {
         throw std::runtime_error("Variable label already exists. Please try a new label");
     } else {
-        TableRow new_var = { 0 , label};
+        TableRow_AddRow new_var;
+        new_var.label = label;
         return unique_table.addRow(&new_var);
     }
 }
@@ -177,7 +181,7 @@ BDD_ID Manager::ite(BDD_ID i, BDD_ID t, BDD_ID e)
     BDD_ID topVariable,topVari,topVart,topVare;
     BDD_ID high, low;
     BDD_ID Cp_ID;
-    TableRow new_row_data;
+    TableRow_AddRow new_row_data;
     size_t check_row_data_ID,CPT_Id;
     CPTableRow *check_cp_row_data, new_cpt_row;
     string* temp_label = &label_storage;
@@ -205,7 +209,7 @@ BDD_ID Manager::ite(BDD_ID i, BDD_ID t, BDD_ID e)
             else  
             {
                 string label = "";//"neg("+ data->label+")";
-                new_row_data = {0,label,data->low,data->high,data->topVar};
+                new_row_data = {label,data->low,data->high,data->topVar};
                 check_row_data_ID = unique_table.addRow(&new_row_data);
                 new_cpt_row = {check_row_data_ID,i,t,e};
                 computed_table.addRowCPTable(&new_cpt_row);
@@ -250,7 +254,7 @@ BDD_ID Manager::ite(BDD_ID i, BDD_ID t, BDD_ID e)
         }
         else
         {
-            new_row_data = {0,*temp_label,high,low,topVariable};
+            new_row_data = {*temp_label,high,low,topVariable};
             label_storage = "";
             Cp_ID = unique_table.addRow(&new_row_data); 
             new_cpt_row = {Cp_ID,i,t,e};
