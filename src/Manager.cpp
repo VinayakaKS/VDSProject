@@ -17,13 +17,11 @@ BDD_ID Manager::createVar(const std::string &label) {
     // if(!std::regex_match(label, pattern)) {
     //     throw std::runtime_error("Variable label is not valid. A valid label should contain one or more single alphabets seperated by logical operators (+ * ^ !) or starting with !");
     // }
-    
-    
 
     if(unique_table.getRowByLabel(label)) {
         throw std::runtime_error("Variable label already exists. Please try a new label");
     } else {
-        TableRow new_var = {label};
+        TableRow new_var = {label }; //Explicitly pass in the high and low
         return unique_table.addRow(&new_var);
     }
 }
@@ -170,12 +168,12 @@ BDD_ID Manager::coFactorFalse(BDD_ID f){
  */
 BDD_ID Manager::ite(BDD_ID i, BDD_ID t, BDD_ID e)  
 {
-    BDD_ID topVariable,topVari,topVart,topVare;
+    BDD_ID topVariable;
     BDD_ID high, low;
     BDD_ID Cp_ID;
     TableRow new_row_data;
     size_t check_row_data_ID,CPT_Id;
-    CPTableRow new_cpt_row;
+    CPTableRow new_cpt_row = {0,i,t,e};
     string temp_label = "";
     
     /*Invalid BDD_ID exception*/
@@ -189,9 +187,9 @@ BDD_ID Manager::ite(BDD_ID i, BDD_ID t, BDD_ID e)
     if(i==0) return e;                       //ite(0,t,e)
     if(t==e) return t;                       //ite(i,t,t)
     if(t==1 && e==0) return i;               //ite(i,1,0)
+    TableRow *data = getData(i);
     if(t==0 && e==1)                         //ite(i,0,1) should return neg(i)
     {
-        TableRow *data = getData(i);
         if(i != FALSE_ROW && i != TRUE_ROW && data->high == TRUE_ROW && data->low == FALSE_ROW && data->topVar == i) {
             /*Check for the redundancy*/
             check_row_data_ID = unique_table.getRowByData({data->low,data->high,data->topVar});
@@ -204,7 +202,7 @@ BDD_ID Manager::ite(BDD_ID i, BDD_ID t, BDD_ID e)
                 // new_row_data = {0,"",data->low,data->high,data->topVar};
                 new_row_data = {"",data->low,data->high,data->topVar};
                 check_row_data_ID = unique_table.addRow( &new_row_data );
-                new_cpt_row = {check_row_data_ID,i,t,e};
+                new_cpt_row.id = check_row_data_ID;
                 computed_table.addRowCPTable(&new_cpt_row);
                 return check_row_data_ID;
             }
@@ -227,13 +225,20 @@ BDD_ID Manager::ite(BDD_ID i, BDD_ID t, BDD_ID e)
     }
 
     else {
-        /*Find top variable*/
-        topVari =  ((i!=1)&(i!=0))? topVar(i): LIMIT;
-        topVart =  ((t!=1)&(t!=0))? topVar(t): LIMIT;
-        topVare =  ((e!=1)&(e!=0))? topVar(e): LIMIT;
 
-        topVariable = min(topVari,topVart);
-        topVariable = min(topVariable,topVare);
+        // Replace this by isConstant and get TopVariable
+        // Remove Limits
+
+        /*Find top variable*/
+        topVariable = data->topVar;
+        if(!isConstant(t)) {
+            topVariable = min(topVariable ,topVar(t));
+            if(!isConstant(e)) {
+                topVariable = min(topVariable , topVar(e));
+            } 
+        } else if(!isConstant(e)) {
+            topVariable = min(topVariable ,topVar(e));
+        }
 
         /*Recursive ite to find successors*/
         high = ite(coFactorTrue(i,topVariable),coFactorTrue(t,topVariable),coFactorTrue(e,topVariable));
@@ -249,7 +254,7 @@ BDD_ID Manager::ite(BDD_ID i, BDD_ID t, BDD_ID e)
         if(check_row_data_ID != -1)
         {
             //cout<<"entering in for redundancy check for Unique table"<<endl;
-            new_cpt_row = {check_row_data_ID,i,t,e};
+            new_cpt_row.id = check_row_data_ID;
             computed_table.addRowCPTable(&new_cpt_row); 
             return check_row_data_ID;
         }
@@ -257,7 +262,7 @@ BDD_ID Manager::ite(BDD_ID i, BDD_ID t, BDD_ID e)
         {
             new_row_data = {"",high,low,topVariable};
             Cp_ID = unique_table.addRow(&new_row_data); 
-            new_cpt_row = {Cp_ID,i,t,e};
+            new_cpt_row.id = Cp_ID;
             computed_table.addRowCPTable(&new_cpt_row); 
             return Cp_ID;
         }

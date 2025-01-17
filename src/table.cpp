@@ -6,7 +6,6 @@
 
 using namespace std;
 
-const size_t LIMIT = 9999999999;
 const size_t HIGH = 1;
 const size_t LOW = 0;
 
@@ -16,9 +15,8 @@ struct CPTableRow{
     size_t i;
     size_t t;
     size_t e;
-    CPTableRow(size_t id = LIMIT, size_t i = LIMIT, size_t t = LIMIT, size_t e = LIMIT)
+    CPTableRow(size_t id , size_t i , size_t t , size_t e )
         : id(id),i(i), t(t), e(e) {}
-
 };
 
 struct CPTkey{
@@ -46,13 +44,10 @@ struct CPTHash {
 
 // Computed Table class
 class DynTable{
-    vector<CPTableRow> UniqueTable;             // Stores rows in Unique table
     unordered_map<CPTkey,size_t, CPTHash> rowDataMap;
 
     public:
         void addRowCPTable(CPTableRow *row_data) {
-            // CPTableRow data = {row_data->id,row_data->i,row_data->t,row_data->e};
-            UniqueTable.push_back(*row_data);
             rowDataMap[{row_data->i,row_data->t,row_data->e}] = row_data->id;
         }
 
@@ -68,8 +63,8 @@ class DynTable{
         void displayTable() const {
             cout<<"\nComputed Table"<<endl;
             std::cout << endl << "BDD_ID\t\tI\tT\tE\n";
-            for (const auto &row : UniqueTable) {
-                std::cout << row.id << "\t\t"<< row.i << "\t" << row.t << "\t" << row.e << "\n";
+            for (const auto &row : rowDataMap) {
+                std::cout << row.second << "\t\t"<< row.first.i << "\t" << row.first.t << "\t" << row.first.e << "\n";
             }
         }
 };
@@ -82,7 +77,7 @@ struct TableRow {
     size_t low;                      // Points to low side node
     size_t topVar;                   // Top variable
 
-    TableRow(const string &label="", size_t high = LIMIT, size_t low = LIMIT, size_t topVar = LIMIT)
+    TableRow(const string &label="", size_t high = HIGH, size_t low = LOW, size_t topVar = LOW )
         :id(LOW) , label(label), high(high), low(low), topVar(topVar) {}
 };
 
@@ -110,7 +105,7 @@ struct UTHash {
 // Unique Table class
 class DynamicTable {
     vector<TableRow> UniqueTable;                    // Stores rows in Unique table
-    unordered_map<string, size_t> labelMap;          // Maps id to index in `UniqueTable` for fast lookup
+    unordered_map<string, size_t> labelMap;          // Maps id to label in `UniqueTable` for fast lookup
     unordered_map<UTkey,size_t,UTHash> rowMap;
 
     public:
@@ -119,16 +114,8 @@ class DynamicTable {
         size_t addRow(TableRow *row_data) {
             size_t new_id = last_id;
 
-            if(row_data->topVar == LIMIT) {
+            if(row_data->topVar == LOW) {
                 row_data->topVar = new_id;
-            }
-
-            if(row_data->high == LIMIT) {
-                row_data->high = HIGH;
-            }
-
-            if(row_data->low == LIMIT) {
-                row_data->low = LOW;
             }
 
             row_data->id = new_id;
@@ -162,7 +149,6 @@ class DynamicTable {
             if(it != rowMap.end()){
                 return it->second;
             }
-            
             return -1;
         }
 
@@ -185,7 +171,6 @@ class DynamicTable {
         {
             // Clear all data structures
             UniqueTable.clear();          // Clears the vector containing table rows
-            // idMap.clear();                // Clears the idMap
             labelMap.clear();             // Clears the labelMap
             last_id = 0;                  // Reset the last_id counter
             cout << "Table has been deleted." << endl;
