@@ -7,5 +7,6 @@
 
 #include <gtest/gtest.h>
 #include "../Manager.h"
+#include "../Reachability.h"
 
 #endif

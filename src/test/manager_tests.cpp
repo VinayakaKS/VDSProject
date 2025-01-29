@@ -527,3 +527,31 @@ TEST_F(ManagerTest, CoFactorTest) /* NOLINT */
     EXPECT_EQ(temp_obj->coFactorTrue(a_and_b_id, b_id), a_id);
 }
 /////////   END OF Additional Tests       ///////////
+
+
+//////// Start of Reachability Tests      ///////////
+struct ReachabilityTest : testing::Test {
+
+    std::unique_ptr<ClassProject::ReachabilityInterface> fsm2 = std::make_unique<ClassProject::Reachability>(2);
+
+    std::vector<ClassProject::BDD_ID> stateVars2 = fsm2->getStates();
+    std::vector<ClassProject::BDD_ID> transitionFunctions;
+
+};
+
+TEST_F(ReachabilityTest, HowTo_Example) { /* NOLINT */
+
+    ClassProject::BDD_ID s0 = stateVars2.at(0);
+    ClassProject::BDD_ID s1 = stateVars2.at(1);
+
+    transitionFunctions.push_back(fsm2->neg(s0)); // s0' = not(s0)
+    transitionFunctions.push_back(fsm2->neg(s1)); // s1' = not(s1)
+    fsm2->setTransitionFunctions(transitionFunctions);
+
+    fsm2->setInitState({false,false});
+
+    ASSERT_TRUE(fsm2->isReachable({false, false}));
+    ASSERT_FALSE(fsm2->isReachable({false, true}));
+    ASSERT_FALSE(fsm2->isReachable({true, false}));
+    ASSERT_TRUE(fsm2->isReachable({true, true}));
+}
