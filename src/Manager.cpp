@@ -409,7 +409,7 @@ void Manager::findNodesOrVars(const BDD_ID &root, std::set<BDD_ID> &nodes_of_roo
     if(tr) 
     {
         addToSet(nodes_of_root , tr->id , node);
-        if(!node && isVariable(tr->topVar))
+        if((!node && isVariable(tr->topVar)))
         {
             addToSet(nodes_of_root , tr->topVar , node);
         }

@@ -9,8 +9,8 @@ using namespace ClassProject;
  *
  * @returns vector with the BDD_ID of each state bit
  */
-const std::vector<BDD_ID> &Reachability::getStates() {
-     return States;
+const std::vector<BDD_ID>& Reachability::getStates() const {
+    return States;
 };
 
 
@@ -19,7 +19,7 @@ const std::vector<BDD_ID> &Reachability::getStates() {
  *
  * @returns vector with the BDD_ID of each input bit
  */
-const std::vector<BDD_ID> &Reachability::getInputs() {
+const std::vector<BDD_ID>& Reachability::getInputs() const {
     return Inputs;
 };
 
@@ -33,7 +33,30 @@ const std::vector<BDD_ID> &Reachability::getInputs() {
  * @throws std::runtime_error if size does not match with number of state bits
  */
 bool Reachability::isReachable(const std::vector<bool> &stateVector) {
-
+     if(stateVector.size() != States.size()) {
+        throw std::runtime_error("An initial value must be specified for each state!"); 
+    } else {
+        if(Cr == -1) {
+            cout << "Before Computing Reachable States" << endl;
+            computeReachableStates();
+        }
+        cout << "After Computing Reachable States" << endl;
+        BDD_ID states_id = stateVector.at(0) ? xnor2( States.at(0) , True()) : xnor2( States.at(0), False());
+        for (size_t i = 1; i < States.size() ; i++)
+        {
+            states_id = stateVector.at(i) ?  and2(xnor2( States.at(i) , True())  , states_id) : and2(xnor2(States.at(i) , False()) , states_id);
+        }
+        cout << "States ID : " << states_id << endl;
+        set<BDD_ID> reachable_nodes;  
+        cout << Cr << endl ;
+        findNodes(Cr, reachable_nodes);
+        for (BDD_ID node : reachable_nodes)
+        {
+            cout << "reachable node : " << node << endl;
+        }
+        
+        return reachable_nodes.find(states_id) != reachable_nodes.end();
+    }
 };
 
 
@@ -60,7 +83,7 @@ bool Reachability::isReachable(const std::vector<bool> &stateVector) {
  * @throws std::runtime_error if size does not match with number of state bits
  */
 int Reachability::stateDistance(const std::vector<bool> &stateVector) {
-
+    return 0;
 };
 
 
@@ -84,7 +107,7 @@ void Reachability::setTransitionFunctions(const std::vector<BDD_ID> &transitionF
         throw std::runtime_error("A transition function must be specified for each state!"); 
     } else {
         for (BDD_ID transition : transitionFunctions) {
-            if(transition > manager.return_lastID()) {
+            if(transition > return_lastID()) {
                 throw std::runtime_error("Invalid BDD_ID");
             } else {
                 TranistionFunctions.push_back(transition);
@@ -103,5 +126,76 @@ void Reachability::setTransitionFunctions(const std::vector<BDD_ID> &transitionF
  * @throws std::runtime_error if size does not match with number of state bits
  */
 void Reachability::setInitState(const std::vector<bool> &stateVector) {
-
+    if(stateVector.size() != States.size()) {
+        throw std::runtime_error("An initial value must be specified for each state!"); 
+    } else {
+        initState = stateVector.at(0) ? xnor2(States.at(0) , True()): xnor2(States.at(0) , False());
+        for (size_t i = 1; i < States.size() ; i++)
+        {
+            initState = stateVector.at(i) ?  and2(xnor2(States.at(i) , True()) , initState) : and2(xnor2(States.at(i) , False()) , initState);
+        }
+    }
 };
+
+BDD_ID Reachability::quantifyCr(BDD_ID Crc ,  bool states , bool next) {
+    BDD_ID quantified = Crc;
+    for (BDD_ID input : Inputs) {
+        cout << "quantifying wrt input : " << input << endl;
+        quantified = or2(coFactorTrue(quantified , input)  , coFactorFalse(quantified , input));
+    }
+
+    if(states) {
+        for (BDD_ID st : States) {
+            cout << "quantifying wrt st : " << st << endl;
+            quantified = or2(coFactorTrue(quantified , st)  , coFactorFalse(quantified , st));
+        }
+    }
+
+    if(next) {
+        for (BDD_ID nxt : Next_states) {
+            cout << "quantifying wrt nxt : " << nxt << endl;
+            quantified = or2(coFactorTrue(quantified , nxt)  , coFactorFalse(quantified , nxt));
+        }
+    }
+
+    return quantified;
+}
+
+void Reachability::computeReachableStates() {
+    TransitionRelation = computeTransitionRelation();
+    BDD_ID Crit = initState;
+    cout << "Initial Crit" << Crit << endl;
+    do
+    {
+        cout << "Cr : " << Crit << endl;
+        Cr = Crit;
+        BDD_ID temp1 = and2(Cr , TransitionRelation);
+        cout << "temp1: " << temp1 << "  Transition Relation : " << TransitionRelation << endl;
+        BDD_ID img_prime = quantifyCr(temp1 , true , false);
+        cout << "img_prime : " << img_prime << endl;
+        BDD_ID temp = img_prime;
+        for (size_t i = 0; i < States.size(); i++)
+        {
+            temp = and2(xnor2(States.at(i) , Next_states.at(i)) , temp);
+        }
+        cout << "temp : " << temp << endl;
+        BDD_ID img = quantifyCr(temp , false , true);
+
+        cout << "img : " << img << endl;
+
+        Crit = or2(Cr , img);
+        cout << "Crit : " << Crit << " and Cr : " << Cr << endl;
+    } while (Cr != Crit);
+
+    cout << "Cr" << Cr << endl;
+    
+    print_table();
+}
+
+BDD_ID Reachability::computeTransitionRelation() {
+    BDD_ID transitionRelation = xnor2(Next_states.at(0) , TranistionFunctions.at(0));
+    for(size_t i = 1 ; i < Next_states.size() ; i++) {
+        transitionRelation = and2(xnor2(Next_states.at(i) , TranistionFunctions.at(i)) , transitionRelation);
+    }
+    return transitionRelation;
+}
