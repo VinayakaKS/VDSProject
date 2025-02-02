@@ -1,4 +1,6 @@
 #include "Reachability.h"
+#include <iostream>
+#include <vector>
 
 using namespace std;
 using namespace ClassProject;
@@ -10,6 +12,11 @@ using namespace ClassProject;
  * @returns vector with the BDD_ID of each state bit
  */
 const std::vector<BDD_ID>& Reachability::getStates() const {
+    cout << "States Vector: ";
+    for (int state : States) {
+        cout << state << " ";
+    }
+    cout << endl;
     return States;
 };
 
@@ -55,7 +62,8 @@ bool Reachability::isReachable(const std::vector<bool> &stateVector) {
             cout << "reachable node : " << node << endl;
         }
         
-        return reachable_nodes.find(states_id) != reachable_nodes.end();
+        return and2(states_id, Cr) != False();
+        //return reachable_nodes.find(states_id) != reachable_nodes.end();
     }
 };
 
@@ -176,7 +184,7 @@ void Reachability::computeReachableStates() {
         BDD_ID temp = img_prime;
         for (size_t i = 0; i < States.size(); i++)
         {
-            temp = and2(xnor2(States.at(i) , Next_states.at(i)) , temp);
+            temp = and2(xnor2(States.at(i) , Next_states.at(i)) , temp); // this is the
         }
         cout << "temp : " << temp << endl;
         BDD_ID img = quantifyCr(temp , false , true);
@@ -188,9 +196,11 @@ void Reachability::computeReachableStates() {
     } while (Cr != Crit);
 
     cout << "Cr" << Cr << endl;
+
     
     print_table();
 }
+
 
 BDD_ID Reachability::computeTransitionRelation() {
     BDD_ID transitionRelation = xnor2(Next_states.at(0) , TranistionFunctions.at(0));
