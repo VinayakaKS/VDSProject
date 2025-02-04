@@ -28,8 +28,6 @@ namespace ClassProject {
                         Next_states.push_back(createVar("Sn" + to_string(i)));
                     }
                 }
-                print_table();
-                cout << "Table printed for constructor" << endl;
             };
 
             virtual const std::vector<BDD_ID> &getStates() const ;
@@ -46,14 +44,18 @@ namespace ClassProject {
 
             BDD_ID quantifyCr(BDD_ID Crc , bool states , bool next);
 
-            void computeReachableStates();
+            void computeReachableStates(); 
             BDD_ID computeTransitionRelation();
+            BDD_ID getCR(){
+                return Cr;
+            }
 
         private:
             vector<BDD_ID> States;
             vector<BDD_ID> Next_states;
             vector<BDD_ID> Inputs;
             vector<BDD_ID> TranistionFunctions;
+            vector<BDD_ID> state_space;
             BDD_ID initState ;
             BDD_ID Cr = -1;
             BDD_ID TransitionRelation ;
