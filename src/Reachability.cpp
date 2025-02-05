@@ -49,6 +49,8 @@ bool Reachability::isReachable(const std::vector<bool> &stateVector) {
             computeReachableStates();
             print_table();
         }
+
+        //REUSE CODE - MAKE NEW FUNCTION
         BDD_ID states_id = stateVector.at(0) ? xnor2( States.at(0) , True()) : xnor2( States.at(0), False());
         for (size_t i = 1; i < States.size() ; i++)
         {
@@ -59,7 +61,7 @@ bool Reachability::isReachable(const std::vector<bool> &stateVector) {
         // cout << "States ID : " << states_id << endl;
         //---------------------------------------------------------------------------------------//
 
-        
+        //REUSE CODE - MAKE NEW FUNCTION - Intersect
         return and2(states_id, Cr) != False();
     }
 };
@@ -92,7 +94,9 @@ int Reachability::stateDistance(const std::vector<bool> &stateVector) {
     
     if(stateVector.size() != States.size()) {
         throw std::runtime_error("An initial value must be specified for each state!"); 
-    } else {
+    } 
+    //NO NEED FOR ELSE
+    else {
         if(Cr == CR_UNCOMPUTED) {
             computeReachableStates();
         }
@@ -103,6 +107,7 @@ int Reachability::stateDistance(const std::vector<bool> &stateVector) {
             states_id = stateVector.at(i) ?  and2(xnor2( States.at(i) , True())  , states_id) : and2(xnor2(States.at(i) , False()) , states_id);
         }
 
+        //Binary search
         for(auto i : state_space)
         {   
             if(and2(states_id,i)){
@@ -199,6 +204,7 @@ void Reachability::computeReachableStates() {
     state_space.push_back(Crit);
 
     cout<<"Computing reachable states"<<endl;
+    //REMOVE DEBUG LINES AND AUTO FORMAT
     //----------------------------------- DEBUG ---------------------------------------------//
     // cout << "Initial Crit" << Crit << endl;
     //---------------------------------------------------------------------------------------//
