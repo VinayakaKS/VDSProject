@@ -533,13 +533,17 @@ TEST_F(ManagerTest, CoFactorTest) /* NOLINT */
 struct ReachabilityTest : testing::Test {
 
     std::unique_ptr<ClassProject::ReachabilityInterface> fsm2 = std::make_unique<ClassProject::Reachability>(2);
+    std::unique_ptr<ClassProject::ReachabilityInterface> fsm3 = std::make_unique<ClassProject::Reachability>(2,1);
     std::vector<ClassProject::BDD_ID> stateVars2 = fsm2->getStates();
+    std::vector<ClassProject::BDD_ID> stateVars3 = fsm3->getStates();
+    std::vector<ClassProject::BDD_ID> InputVars2 = fsm3->getInputs();
     std::vector<ClassProject::BDD_ID> transitionFunctions;
 
 };
 
 TEST_F(ReachabilityTest, HowTo_Example) { /* NOLINT */
     cout << stateVars2.size() << endl;
+    cout << InputVars2.size() << endl;
     ClassProject::BDD_ID s0 = stateVars2.at(0);
     ClassProject::BDD_ID s1 = stateVars2.at(1);
     cout << s0 << "   " << s1 << endl;
@@ -553,4 +557,25 @@ TEST_F(ReachabilityTest, HowTo_Example) { /* NOLINT */
     ASSERT_FALSE(fsm2->isReachable({false, true}));
     ASSERT_FALSE(fsm2->isReachable({true, false}));
     ASSERT_TRUE(fsm2->isReachable({true, true}));
+}
+
+TEST_F(ReachabilityTest, With_inputs) { /* NOLINT */
+    cout << stateVars3.size() << endl;
+    ClassProject::BDD_ID s0 = stateVars3.at(0);
+    ClassProject::BDD_ID s1 = stateVars3.at(1);
+    cout << s0 << "   " << s1 << endl;
+    ClassProject::BDD_ID a = InputVars2.at(0);
+    //ClassProject::BDD_ID b = InputVars2.at(1);
+    cout << a << "the input variable   " <<endl;
+    transitionFunctions.push_back(fsm3->neg(s0)); // s0' = not(s0)
+    transitionFunctions.push_back(fsm3->and2(s1,a)); // s1' = not(s1)
+
+    cout << "transitionFunctions " << transitionFunctions.size() << endl;
+    fsm3->setTransitionFunctions(transitionFunctions);
+    fsm3->setInitState({false,false});
+    ASSERT_TRUE(fsm3->isReachable({false, false}));
+    ASSERT_FALSE(fsm3->isReachable({false, true}));
+    ASSERT_TRUE(fsm3->isReachable({true, false}));
+    ASSERT_FALSE(fsm3->isReachable({true, true}));
+    //EXPECT_EQ(fsm3->stateDistance({false,true},TRUE_ID)
 }

@@ -47,6 +47,7 @@ bool Reachability::isReachable(const std::vector<bool> &stateVector) {
     } else {
         if(Cr == CR_UNCOMPUTED) {
             computeReachableStates();
+            print_table();
         }
         BDD_ID states_id = stateVector.at(0) ? xnor2( States.at(0) , True()) : xnor2( States.at(0), False());
         for (size_t i = 1; i < States.size() ; i++)
@@ -233,6 +234,7 @@ void Reachability::computeReachableStates() {
         Crit = or2(Cr , img);
         //----------------------------------- DEBUG ---------------------------------------------//
         // cout << "Crit : " << Crit << " and Cr : " << Cr << endl;
+        //print_table();
         //---------------------------------------------------------------------------------------//
     } while (Cr != Crit);
 }

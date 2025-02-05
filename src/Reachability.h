@@ -8,7 +8,7 @@ namespace ClassProject {
     class Reachability : public ReachabilityInterface {
         public:
 
-            Reachability(unsigned int stateSize, unsigned int inputSize = 0) : ReachabilityInterface(stateSize, inputSize) {
+            Reachability(unsigned int stateSize, unsigned int inputSize =0) : ReachabilityInterface(stateSize, inputSize) {
                 if (stateSize == 0) {
                     throw std::runtime_error("stateSize must be a positive integer");
                 } else {
@@ -59,6 +59,7 @@ namespace ClassProject {
             BDD_ID initState ;
             BDD_ID Cr = -1;
             BDD_ID TransitionRelation ;
+
     };
 
 }
